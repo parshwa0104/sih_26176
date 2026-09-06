@@ -1,0 +1,103 @@
+.side-panel {
+  padding: 16px 16px 14px;
+  margin-bottom: 16px;
+}
+
+.side-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.side-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.side-panel-title svg { color: var(--cyan-soft); }
+
+.side-panel-link {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border: none;
+  background: transparent;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--cyan-soft);
+}
+
+.insight-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.insight-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  text-align: left;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.insight-row:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.insight-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.insight-icon.tone-teal    { background: rgba(20, 184, 166, 0.16); color: #4fd8c9; }
+.insight-icon.tone-danger  { background: var(--danger-dim); color: var(--danger); }
+.insight-icon.tone-blue    { background: rgba(59, 130, 246, 0.16); color: #7cabfb; }
+.insight-icon.tone-indigo  { background: rgba(99, 102, 241, 0.16); color: #a5aefc; }
+
+.insight-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  min-width: 0;
+}
+
+/* Title and subtitle always on their own lines — no run-together */
+.insight-title {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.insight-subtitle {
+  display: block;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ink-dim);
+}
+
+.insight-chev {
+  margin-left: auto;
+  align-self: center;
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}

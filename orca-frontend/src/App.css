@@ -1,0 +1,75 @@
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(1100px 500px at 15% -10%, rgba(45, 212, 245, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(59, 130, 246, 0.07), transparent 55%),
+    var(--void);
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  padding: 22px 24px 36px;
+  overflow-y: auto;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 18px;
+  align-items: start;
+}
+
+.dashboard-col-main {
+  min-width: 0;
+}
+
+.dashboard-col-side {
+  min-width: 0;
+}
+
+@media (max-width: 1180px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ===== Layout guards: keep columns apart, right rail never overlaps ===== */
+.dashboard-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 320px !important;
+  gap: 18px !important;
+  align-items: start !important;
+}
+
+.dashboard-col-main,
+.dashboard-col-side {
+  min-width: 0 !important;
+}
+
+.dashboard-col-side {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+}
+
+.dashboard-col-side .side-panel {
+  position: relative !important;
+  margin: 0 0 0 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.map-card,
+.map-card-body {
+  overflow: hidden !important;
+}

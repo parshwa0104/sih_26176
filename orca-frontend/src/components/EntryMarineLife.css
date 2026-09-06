@@ -1,0 +1,121 @@
+/* ============ ORCA entry — underwater ambience ============ */
+.marine-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* soft moving light / caustics */
+.marine-caustics {
+  position: absolute;
+  inset: -20%;
+  opacity: 0.55;
+  background:
+    radial-gradient(28% 22% at 22% 18%, rgba(140, 220, 255, 0.06), transparent 70%),
+    radial-gradient(20% 16% at 68% 30%, rgba(150, 225, 255, 0.05), transparent 70%),
+    radial-gradient(30% 24% at 45% 72%, rgba(130, 210, 245, 0.04), transparent 70%);
+  animation: causticDrift 11s ease-in-out infinite alternate;
+}
+@keyframes causticDrift {
+  from { transform: translate3d(-2%, -1%, 0) scale(1); }
+  to { transform: translate3d(2.5%, 2%, 0) scale(1.06); }
+}
+
+/* plankton drift */
+.marine-plankton { position: absolute; inset: 0; }
+.plankton {
+  position: absolute;
+  width: 2px; height: 2px;
+  border-radius: 50%;
+  background: rgba(190, 235, 250, 0.22);
+  animation-name: planktonDrift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+@keyframes planktonDrift {
+  0%, 100% { transform: translate(0, 0); opacity: 0.15; }
+  50% { transform: translate(14px, -22px); opacity: 0.5; }
+}
+
+/* fish motion layers: depth(scale/opacity) > swimX > bob > wobble */
+.school { position: absolute; left: 0; right: 0; height: 0; }
+.fish-anim { position: absolute; top: 0; left: 0; will-change: transform; }
+.dir-l { transform: scaleX(-1); }
+
+.d-far   { opacity: 0.07; transform: scale(0.8); }
+.d-mid   { opacity: 0.1;  transform: scale(1); }
+.d-near  { opacity: 0.14; transform: scale(1.35); }
+.d-lone  { opacity: 0.05; transform: scale(1.9); }
+.d-lone2 { opacity: 0.09; transform: scale(2.4); }
+
+.fish-anim.dir-l.d-far, .fish-anim.dir-l.d-mid,
+.fish-anim.dir-l.d-near, .fish-anim.dir-l.d-lone, .fish-anim.dir-l.d-lone2 {
+  transform: scaleX(-1);
+}
+
+.fish-shape { display: block; color: #cfeefb; filter: drop-shadow(0 0 6px rgba(160, 225, 250, 0.25)); }
+
+.fish-anim { animation-name: swimRight; animation-timing-function: linear; animation-iteration-count: infinite; }
+.fish-anim.dir-l { animation-name: swimLeft; }
+@keyframes swimRight {
+  from { transform: translateX(-180px); }
+  to { transform: translateX(calc(100vw + 220px)); }
+}
+@keyframes swimLeft {
+  from { transform: translateX(calc(100vw + 220px)); }
+  to { transform: translateX(-180px); }
+}
+
+.fish-bob {
+  display: block;
+  animation-name: bobY;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+@keyframes bobY { from { transform: translateY(-7px); } to { transform: translateY(7px); } }
+
+.fish-wob { display: block; animation: wobble 4.2s ease-in-out infinite alternate; transform-origin: 50% 50%; }
+@keyframes wobble { from { transform: rotate(-5deg); } to { transform: rotate(6deg); } }
+
+/* faint whale drifting far in the background */
+.whale {
+  position: absolute;
+  bottom: 4%;
+  left: 0;
+  color: rgba(170, 225, 245, 0.045);
+  animation: whalePass 46s linear infinite;
+}
+.whale svg { display: block; }
+@keyframes whalePass {
+  from { transform: translateX(-260px); }
+  to { transform: translateX(calc(100vw + 260px)); }
+}
+
+/* occasional tiny bubbles */
+.bubble {
+  position: absolute;
+  bottom: -8px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  border: 1px solid rgba(200, 240, 255, 0.16);
+  background: rgba(200, 240, 255, 0.05);
+  animation-name: bubbleRise;
+  animation-timing-function: ease-in;
+  animation-iteration-count: infinite;
+  opacity: 0;
+}
+@keyframes bubbleRise {
+  0% { transform: translateY(0); opacity: 0; }
+  15% { opacity: 0.4; }
+  60% { opacity: 0.15; }
+  100% { transform: translateY(-72vh) translateX(18px); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marine-caustics, .plankton, .fish-anim, .fish-bob, .fish-wob, .whale, .bubble {
+    animation: none !important;
+  }
+}

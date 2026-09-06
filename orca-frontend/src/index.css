@@ -1,0 +1,166 @@
+/* ============================================================
+   ORCA — Design System v2
+   Scientific oceanographic instrument language.
+   All v1 token names/values preserved for compatibility.
+   ============================================================ */
+
+:root {
+  /* --- depth palette (unchanged) --- */
+  --void: #050c17;
+  --bg: #071a2c;
+  --bg-elevated: #0a2138;
+  --panel: #0c2743;
+  --panel-soft: #0a2038;
+  --panel-glass: rgba(14, 40, 66, 0.55);
+  --border: rgba(134, 202, 240, 0.14);
+  --border-strong: rgba(134, 202, 240, 0.28);
+
+  /* --- accent palette (unchanged) --- */
+  --cyan: #2dd4f5;
+  --cyan-soft: #7fe6fa;
+  --cyan-dim: rgba(45, 212, 245, 0.16);
+  --teal: #14b8a6;
+  --blue: #3b82f6;
+  --deep-blue: #1e3a8a;
+
+  /* --- ink (unchanged) --- */
+  --ink: #eaf4fb;
+  --ink-soft: #b6cbe0;
+  --ink-dim: #7f9bb5;
+  --ink-faint: #52708c;
+
+  /* --- status (unchanged) --- */
+  --success: #2bd08a;
+  --success-dim: rgba(43, 208, 138, 0.14);
+  --warning: #f5a94e;
+  --warning-dim: rgba(245, 169, 78, 0.14);
+  --danger: #f5586a;
+  --danger-dim: rgba(245, 88, 106, 0.14);
+
+  /* --- surface radii --- */
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+  --r-canvas: 10px;
+  --r-chip: 999px;
+
+  /* --- type --- */
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', monospace;
+
+  /* --- motion tokens --- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 140ms;
+  --dur-med: 260ms;
+  --dur-slow: 520ms;
+
+  /* --- ocean data-viz ramps --- */
+  --grad-sst: linear-gradient(90deg, #3b82f6, #2dd4f5, #37e6c4, #ffcf5c, #ff8a3d);
+  --grad-chl: linear-gradient(90deg, #06304a, #14b8a6, #ffcf5c);
+  --viz-hot: #ff8a3d;
+  --viz-warm: #ffcf5c;
+  --viz-tempered: #37e6c4;
+  --viz-cool: #2dd4f5;
+
+  /* --- shadows (unchanged) --- */
+  --shadow-soft: 0 8px 30px rgba(0, 8, 20, 0.35);
+  --shadow-lift: 0 16px 44px rgba(0, 10, 26, 0.5);
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background-color: #030b12;
+  background-image:
+    radial-gradient(1100px 620px at 82% -12%, rgba(56, 224, 192, 0.055), transparent 62%),
+    radial-gradient(900px 560px at -8% 108%, rgba(45, 120, 245, 0.06), transparent 58%),
+    repeating-linear-gradient(0deg, rgba(134, 202, 240, 0.022) 0 1px, transparent 1px 60px),
+    repeating-linear-gradient(90deg, rgba(134, 202, 240, 0.022) 0 1px, transparent 1px 60px);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+p { margin: 0; }
+button { font-family: inherit; cursor: pointer; }
+input { font-family: inherit; }
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; margin: 0; padding: 0; }
+
+:focus-visible {
+  outline: 2px solid rgba(45, 212, 245, 0.75);
+  outline-offset: 2px;
+}
+
+::selection { background: var(--cyan-dim); color: var(--ink); }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(134, 202, 240, 0.18); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(134, 202, 240, 0.32); }
+
+.glass-panel {
+  background:
+    linear-gradient(180deg, rgba(19, 48, 76, 0.9), rgba(8, 24, 42, 0.94));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(134, 202, 240, 0.12);
+  border-radius: var(--r-lg);
+  box-shadow:
+    inset 0 1px 0 rgba(180, 222, 242, 0.06),
+    0 10px 28px rgba(0, 6, 16, 0.28);
+}
+
+.hairline {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+}
+
+.font-data {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: 0.01em;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

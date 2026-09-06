@@ -1,0 +1,234 @@
+.query-panel {
+  padding: 16px 18px 18px;
+  margin-bottom: 16px;
+  /* never clip the language dropdown */
+  overflow: visible;
+}
+
+.query-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 11px;
+  overflow: visible;
+}
+
+.query-panel-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cyan-dim);
+  color: var(--cyan-soft);
+}
+
+.query-panel-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.query-panel-phase {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cyan-soft);
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.query-panel-reset {
+  margin-left: 10px;
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--ink-soft);
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.query-panel-reset:hover {
+  color: var(--ink);
+  border-color: var(--cyan-soft);
+}
+
+.query-panel-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 4px 4px 16px;
+  background: var(--panel-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.query-panel-input-row:focus-within {
+  border-color: var(--cyan-soft);
+  box-shadow: 0 0 0 3px var(--cyan-dim);
+}
+
+.query-panel-input-row input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--ink);
+  font-size: 13.5px;
+  padding: 9px 0;
+}
+
+.query-panel-input-row input::placeholder {
+  color: var(--ink-faint);
+}
+
+.query-panel-input-row input:disabled {
+  color: var(--ink-dim);
+}
+
+.query-panel-input-row button {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--cyan-soft), var(--blue));
+  color: #04121f;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.query-panel-input-row button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.query-panel-input-row button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.query-panel-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.query-chip {
+  border: 1px solid var(--border);
+  background: rgba(45, 212, 245, 0.05);
+  color: var(--ink-soft);
+  font-size: 11.5px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.query-chip:hover {
+  border-color: var(--cyan-soft);
+  color: var(--cyan-soft);
+}
+
+/* ===== Language selector ===== */
+.query-lang {
+  position: relative;
+  display: flex;
+}
+
+.query-lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--border-strong);
+  background: var(--panel-soft);
+  color: var(--ink-soft);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.query-lang-btn:hover {
+  color: var(--cyan-soft);
+  border-color: var(--cyan-soft);
+}
+
+.lang-chev {
+  transition: transform 0.2s ease;
+}
+
+.lang-chev.open {
+  transform: rotate(180deg);
+}
+
+.query-lang-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 180px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 120;
+  max-height: 220px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.query-lang-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.query-lang-item:hover {
+  background: var(--panel-soft);
+  color: var(--ink);
+}
+
+.query-lang-item.active {
+  color: var(--cyan-soft);
+}
+
+.query-lang-code {
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.query-lang-name {
+  font-size: 11.5px;
+  color: var(--ink-dim);
+}
+
+.query-lang-item.active .query-lang-name {
+  color: var(--cyan-soft);
+}
+
+.lang-check {
+  margin-left: auto;
+}

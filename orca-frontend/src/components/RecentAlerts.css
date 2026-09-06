@@ -1,0 +1,67 @@
+.alert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alert-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  text-align: left;
+  transition: border-color 0.2s ease, transform 0.15s ease, background 0.2s ease;
+}
+
+.alert-row:hover {
+  border-color: var(--border-strong);
+  background: rgba(45, 212, 245, 0.05);
+  transform: translateY(-1px);
+}
+
+.alert-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sev-danger  { background: var(--danger);  box-shadow: 0 0 8px rgba(245, 88, 106, 0.6); }
+.sev-warning { background: var(--warning); box-shadow: 0 0 8px rgba(245, 169, 78, 0.6); }
+.sev-success { background: var(--success); box-shadow: 0 0 8px rgba(43, 208, 138, 0.6); }
+
+.alert-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.alert-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+.alert-meta {
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+/* chevron alignment — matches AI Insights rows */
+.alert-row .insight-chev {
+  color: var(--ink-faint);
+  opacity: 0.7;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.alert-row:hover .insight-chev {
+  opacity: 1;
+  color: var(--cyan-soft);
+}
