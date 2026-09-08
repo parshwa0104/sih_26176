@@ -8,3 +8,4 @@ langchain-core
 langgraph
 langchain-groq
 streamlit
+langchain-google-genai
