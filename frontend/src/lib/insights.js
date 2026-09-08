@@ -34,7 +34,7 @@ export function deriveInsights({ conditions, pfzZones = [], safetyStatus, t }) {
 
   // 2. Best fishing zone available
   const best = [...pfzZones]
-    .filter((z) => z && typeof z.lat === 'number')
+    .filter((z) => z && typeof z.lat === 'number' && typeof z.lng === 'number')
     .sort((a, b) => rank(b.confidence) - rank(a.confidence))[0]
   if (best) {
     out.push({
@@ -57,8 +57,11 @@ export function deriveInsights({ conditions, pfzZones = [], safetyStatus, t }) {
       id: 'cond',
       severity: 'safe',
       title: t.insightSafeTitle,
-      detail: `SST ${conditions.sst} · Chl-a ${conditions.chlorophyll}`,
-      action: loc ? { type: 'map', center: [loc.lat, loc.lng], zoom: 9 } : null,
+      detail: `SST ${conditions.sst ?? '—'} · Chl-a ${conditions.chlorophyll ?? '—'}`,
+      action:
+        loc && typeof loc.lat === 'number' && typeof loc.lng === 'number'
+          ? { type: 'map', center: [loc.lat, loc.lng], zoom: 9 }
+          : null,
     })
   }
 

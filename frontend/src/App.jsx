@@ -248,7 +248,7 @@ export default function App() {
   const handleInsightAction = useCallback(
     (action) => {
       if (!action) return
-      if (action.type === 'map' && Array.isArray(action.center) && isNum(action.center[0])) {
+      if (action.type === 'map' && Array.isArray(action.center) && isNum(action.center[0]) && isNum(action.center[1])) {
         setCenter(action.center)
         setZoom(action.zoom || 9)
         setActiveNav('map')
@@ -261,7 +261,7 @@ export default function App() {
   )
 
   const handleCenter = useCallback((c, z) => {
-    if (Array.isArray(c) && isNum(c[0])) {
+    if (Array.isArray(c) && isNum(c[0]) && isNum(c[1])) {
       setCenter(c)
       setZoom(z || 10)
       setMobileSheet(null)
@@ -439,7 +439,8 @@ export default function App() {
                     <button
                       type="button"
                       onClick={clearDrawer}
-                      className="rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-ink-dim hover:text-ink"
+                      disabled={qLoading}
+                      className="rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-ink-dim hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {t.clear}
                     </button>
