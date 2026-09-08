@@ -24,7 +24,6 @@ import ReportPanel from './components/ReportPanel'
 import SettingsPanel from './components/SettingsPanel'
 import Login from './components/Login'
 import { useAuth } from './contexts/AuthContext'
-import LayerToggle from './components/LayerToggle'
 import InvestigationView from './components/visualizer/InvestigationView'
 import { useInvestigation } from './components/visualizer/useInvestigation'
 
