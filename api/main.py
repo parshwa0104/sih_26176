@@ -1,17 +1,30 @@
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from dotenv import load_dotenv
+load_dotenv()
 import json
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import List, Dict
-from mock_responses import MOCK_CONDITIONS, MOCK_PFZ_ZONES, MOCK_SEA_STATE
+from api.mock_responses import MOCK_CONDITIONS, MOCK_PFZ_ZONES, MOCK_SEA_STATE
 from fastapi.middleware.cors import CORSMiddleware
 from agents.orca import process_query_stream   # <-- changed from process_query
 
-app = FastAPI(title="ORCA SIH Proto")
+app = FastAPI(title="ORCA — Ocean Risk & Catch Advisor")
+
+# CORS — comma-separated list of allowed origins via env var.
+# Dev default: Vite local dev server. In production set ALLOWED_ORIGINS in your
+# deployment environment (e.g. "https://orca.vercel.app,https://orca-staging.vercel.app")
+_raw_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:4173")
+ALLOWED_ORIGINS = [o.strip() for o in _raw_origins.split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,11 +44,20 @@ def _sse_stream(query: str):
 
 @app.post("/query")
 def process_query_endpoint(request: QueryRequest):
-    return StreamingResponse(
-        _sse_stream(request.message),
-        media_type="text/event-stream",
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
-    )
+    try:
+        return StreamingResponse(
+            _sse_stream(request.message),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        )
+    except Exception as e:
+        print(f"[ORCA] Pipeline error: {e}")
+        return {
+            "text": "ORCA encountered an error processing your request. Please try again.",
+            "error": True,
+            "map_data": None,
+            "reasoning_trail": [{"agent": "Orchestrator", "action": "Processing query", "status": "error", "result": str(e)}],
+        }
 
 @app.get("/conditions")
 def get_conditions():

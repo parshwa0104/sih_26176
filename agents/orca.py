@@ -31,7 +31,14 @@ def process_query_stream(query: str):
     reasoning_trail[-1]["status"] = "done"
     reasoning_trail[-1]["result"] = f"Intent: {intent}, Location: {location}, Language: {language}"
 
-    # — Step 2: Data Fetching —
+    # Fallback to home port if no location extracted
+    home_port = "Kochi"
+    location_note = ""
+    if not location:
+        location = home_port
+        location_note = f" (defaulting to home port: {home_port})"
+
+    # ── Step 2: Data Fetching ──
     pfz_data = {}
     weather_data = {}
     safety_data = {}
@@ -137,7 +144,7 @@ def process_query_stream(query: str):
     reasoning_trail[-1]["status"] = "done"
     reasoning_trail[-1]["result"] = "Response generated"
 
-    map_data = get_map_data(pfz_data, safety_data, geofence_data, route_data)
+    map_data = get_map_data(pfz_data, safety_data, geofence_data, route_data, weather_data)
 
     final_event = {
         "type": "done",

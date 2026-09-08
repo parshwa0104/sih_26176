@@ -1,7 +1,10 @@
 fastapi
-uvicorn
-streamlit
-langchain
-langgraph
+uvicorn[standard]
+pydantic
+httpx
 python-dotenv
+langchain
+langchain-core
+langgraph
 langchain-ollama
+streamlit
