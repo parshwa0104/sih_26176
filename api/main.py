@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import List, Dict
-from mock_responses import MOCK_CONDITIONS, MOCK_PFZ_ZONES, MOCK_SEA_STATE
+from api.mock_responses import MOCK_CONDITIONS, MOCK_PFZ_ZONES, MOCK_SEA_STATE
 from fastapi.middleware.cors import CORSMiddleware
 from agents.orca import process_query_stream   # <-- changed from process_query
 

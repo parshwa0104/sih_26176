@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 .env
+.env.local
+.env.*.local
 .venv/
 venv/
 env/
@@ -15,6 +17,11 @@ yarn-error.log
 dist/
 build/
 .DS_Store
+
+# Frontend build artifacts
+frontend/dist/
+frontend/.env.local
+frontend/.env.*.local
 
 # IDE
 .vscode/

@@ -27,7 +27,7 @@ Answer:"""
 )
 
 
-def get_map_data(pfz_data, safety_data, geofence_data, route_data):
+def get_map_data(pfz_data, safety_data, geofence_data, route_data, weather_data=None):
     """Determine map_data based on what data is available (priority order)."""
     if route_data and route_data.get("waypoints"):
         return route_data
@@ -44,6 +44,12 @@ def get_map_data(pfz_data, safety_data, geofence_data, route_data):
             "bounds": zone["bounds"],
             "name": zone["name"],
             "color": "red",
+        }
+    if weather_data and weather_data.get("lat"):
+        return {
+            "type": "weather",
+            "lat": weather_data["lat"],
+            "lng": weather_data["lng"],
         }
     return None
 
