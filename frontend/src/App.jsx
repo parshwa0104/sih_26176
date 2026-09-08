@@ -21,6 +21,7 @@ import AIInsights from './components/AIInsights'
 import AlertsPanel from './components/AlertsPanel'
 import ZoneDetails from './components/ZoneDetails'
 import BottomSheet from './components/BottomSheet'
+import MapLayers from './components/MapLayers'
 import ReportPanel from './components/ReportPanel'
 import SettingsPanel from './components/SettingsPanel'
 import Login from './components/Login'
@@ -412,7 +413,7 @@ export default function App() {
         {systemStatus === 'offline' && (
           <div
             role="alert"
-            className="flex items-center gap-3 border-b border-status-danger/30 bg-status-danger/10 px-4 py-2 text-sm lg:px-6"
+            className="flex items-center gap-3 border-b border-status-danger/30 bg-status-danger/10 px-4 py-2 text-body lg:px-6"
           >
             <WifiOff size={16} className="shrink-0 text-status-danger" />
             <span className="font-semibold text-ink">{t.backendDown}</span>
@@ -420,7 +421,7 @@ export default function App() {
             <button
               type="button"
               onClick={loadData}
-              className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1 text-xs font-semibold text-accent transition-colors hover:bg-black/5"
+              className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1 text-label text-accent transition-colors hover:bg-black/5"
             >
               <RefreshCw size={12} />
               {t.retry}
@@ -451,24 +452,20 @@ export default function App() {
               </div>
             )}
 
-            {/* Layer toggles */}
-            <div className="absolute left-3 top-3 z-[500] rounded-xl border border-hairline bg-ocean-850/90 p-1 backdrop-blur">
-              <LayerToggle
-                active={showPfz}
-                onClick={() => setShowPfz((v) => !v)}
-                dot="#2EE6A6"
-                label={t.layerPfz}
-              />
-              <LayerToggle
-                active={showSeaState}
-                onClick={() => setShowSeaState((v) => !v)}
-                dot="#22B8FF"
-                label={t.layerSea}
+            {/* Chart layers + legend */}
+            <div className="absolute left-3 top-3 z-[500]">
+              <MapLayers
+                showPfz={showPfz}
+                showSeaState={showSeaState}
+                onTogglePfz={() => setShowPfz((v) => !v)}
+                onToggleSeaState={() => setShowSeaState((v) => !v)}
+                activeOverlay={queryMapData?.type}
+                t={t}
               />
             </div>
 
             {/* Coordinate readout */}
-            <div className="absolute bottom-3 right-3 z-[500] hidden rounded-lg border border-hairline bg-ocean-850/90 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-ink-dim backdrop-blur sm:block">
+            <div className="absolute bottom-3 right-3 z-[500] hidden rounded-lg border border-hairline bg-ocean-850/90 px-2.5 py-1.5 font-mono text-meta uppercase text-ink-dim backdrop-blur sm:block">
               <div className="text-ink">{fmtReadout(readout)}</div>
             </div>
 
@@ -476,13 +473,13 @@ export default function App() {
                 the bottom nav (bar height + safe-area inset). */}
             <div className="absolute inset-x-2 bottom-[calc(72px+env(safe-area-inset-bottom,0px))] z-[600] flex flex-col gap-2 sm:inset-x-3 lg:inset-x-auto lg:bottom-6 lg:left-6 lg:w-[min(640px,52vw)]">
               {drawerActive && !qLoading && drawerContent && (
-                <div className="hidden max-h-[46vh] animate-fade-up overflow-y-auto rounded-2xl border border-hairline-strong bg-ocean-850/95 p-4 shadow-inst backdrop-blur lg:block">
+                <div className="hidden max-h-[46vh] animate-fade-up overflow-y-auto rounded-2xl border border-hairline-strong bg-ocean-850/95 p-block shadow-inst backdrop-blur lg:block">
                   <div className="mb-2 flex justify-end">
                     <button
                       type="button"
                       onClick={clearDrawer}
                       disabled={qLoading}
-                      className="rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-ink-dim hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+                      className="rounded-md px-2 py-0.5 text-label uppercase text-ink-dim hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {t.clear}
                     </button>
@@ -520,7 +517,8 @@ export default function App() {
               loading={dashLoading && !conditions}
               t={t}
             />
-            <div ref={alertsRef}>
+            {/* Alerts read as a recessed tray — exceptions, not steady readouts. */}
+            <div ref={alertsRef} className="mt-auto bg-surface-2/70">
               <AlertsPanel
                 alerts={alerts}
                 loading={dashLoading && !conditions}
@@ -608,7 +606,7 @@ export default function App() {
 /** Contents of the mobile "More" sheet — the nav items that don't fit the bar. */
 function MoreSheet({ onNav, t }) {
   return (
-    <ul className="space-y-2">
+    <ul className="space-y-stack">
       {NAV_ITEMS.filter((i) => i.slot === 'more').map((item) => {
         const Icon = item.icon
         return (
@@ -616,7 +614,7 @@ function MoreSheet({ onNav, t }) {
             <button
               type="button"
               onClick={() => onNav(item.id)}
-              className="flex w-full items-center gap-3 rounded-xl border border-hairline bg-surface-1/40 px-3 py-3 text-left text-sm font-semibold text-ink transition-colors hover:bg-black/5"
+              className="flex w-full items-center gap-3 rounded-xl border border-hairline bg-surface-1/40 px-3 py-3 text-left text-body font-semibold text-ink transition-colors hover:bg-black/5"
             >
               <Icon size={18} className="text-ink-dim" />
               {t[item.labelKey]}
@@ -625,30 +623,6 @@ function MoreSheet({ onNav, t }) {
         )
       })}
     </ul>
-  )
-}
-
-function LayerToggle({ active, onClick, dot, label }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={
-        'flex min-h-[38px] w-full items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-semibold transition-colors ' +
-        (active ? 'text-ink' : 'text-ink-dim hover:text-ink')
-      }
-    >
-      <span
-        className="h-2.5 w-2.5 rounded-full border transition-opacity"
-        style={{
-          background: active ? dot : 'transparent',
-          borderColor: dot,
-          opacity: active ? 1 : 0.5,
-        }}
-      />
-      {label}
-    </button>
   )
 }
 

@@ -54,8 +54,8 @@ export default function ReportPanel({ conditions, pfzZones = [], safetyStatus, t
       <dl className="divide-y divide-hairline">
         {rows.map(([k, v]) => (
           <div key={k} className="grid grid-cols-[92px_1fr] gap-3 py-2.5 sm:grid-cols-[110px_1fr]">
-            <dt className="font-mono text-[10px] uppercase tracking-wider text-ink-dim">{k}</dt>
-            <dd className="text-sm text-ink">{v}</dd>
+            <dt className="font-mono text-meta uppercase text-ink-dim">{k}</dt>
+            <dd className="text-body text-ink">{v}</dd>
           </div>
         ))}
       </dl>
@@ -63,7 +63,7 @@ export default function ReportPanel({ conditions, pfzZones = [], safetyStatus, t
       {conditions?.alerts?.length > 0 && (
         <ul className="mt-3 space-y-1.5 border-t border-hairline pt-3">
           {conditions.alerts.map((a, i) => (
-            <li key={i} className="text-xs text-ink-dim">
+            <li key={i} className="text-caption text-ink-dim">
               • {a.text} <span className="text-ink-dim/60">({a.time})</span>
             </li>
           ))}
@@ -73,7 +73,7 @@ export default function ReportPanel({ conditions, pfzZones = [], safetyStatus, t
       <button
         type="button"
         onClick={copy}
-        className="mt-4 inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-hairline px-3.5 py-2 text-xs font-semibold text-accent transition-colors hover:bg-black/5"
+        className="mt-4 inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-hairline px-3.5 py-2 text-label text-accent transition-colors hover:bg-black/5"
       >
         {copied ? <Check size={13} /> : <Copy size={13} />}
         {copied ? t.copied : t.copyBrief}

@@ -1,4 +1,5 @@
 import { cx } from '../lib/format'
+import { ACCENT } from '../lib/chartColors'
 
 /**
  * ORCA's signature motif: a sonar scope. Concentric range rings + a rotating
@@ -27,15 +28,14 @@ export default function Sonar({ size = 96, active = true, label, className = '' 
         <span
           className="absolute inset-0 rounded-full animate-orca-sweep"
           style={{
-            background:
-              'conic-gradient(from 0deg, rgba(54,207,255,0) 0deg, rgba(54,207,255,0.30) 50deg, rgba(54,207,255,0) 110deg)',
+            background: `conic-gradient(from 0deg, ${ACCENT}00 0deg, ${ACCENT}4D 50deg, ${ACCENT}00 110deg)`,
           }}
         />
       )}
       {active && <span className="absolute h-2.5 w-2.5 rounded-full bg-accent animate-orca-ping" />}
       <span
         className="relative h-1.5 w-1.5 rounded-full bg-accent-bright"
-        style={{ boxShadow: '0 0 10px 2px rgba(54,207,255,0.6)' }}
+        style={{ boxShadow: `0 0 10px 2px ${ACCENT}99` }}
       />
     </div>
   )

@@ -69,7 +69,7 @@ export default function Sidebar({ navState, onNav, systemStatus = 'connecting', 
                 <Icon size={20} strokeWidth={1.75} />
                 <span className="sr-only">{t[item.labelKey]}</span>
                 {item.id === 'alerts' && alertCount > 0 && (
-                  <span className="absolute -right-1 -top-1 grid h-4 min-w-[16px] place-items-center rounded-full bg-status-danger px-1 text-[10px] font-bold text-white">
+                  <span className="absolute -right-1 -top-1 grid h-4 min-w-[16px] place-items-center rounded-full bg-status-danger px-1 text-meta font-bold text-white">
                     {alertCount}
                   </span>
                 )}
@@ -91,7 +91,7 @@ export default function Sidebar({ navState, onNav, systemStatus = 'connecting', 
         </button>
 
         <StatusDot status={systemStatus} />
-        <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-ink-dim">
+        <span className="font-mono text-meta uppercase text-ink-dim">
           {t[STATUS_LABEL[systemStatus]] || t.systemConnecting}
         </span>
       </div>

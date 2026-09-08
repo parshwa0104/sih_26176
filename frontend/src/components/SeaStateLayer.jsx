@@ -1,8 +1,9 @@
 import { Rectangle, Tooltip } from 'react-leaflet'
+import { CHART, SIGNAL } from '../lib/chartColors'
 import { isNum } from '../lib/format'
 
-// Safe cells read as instrumentation blue so green stays exclusive to PFZ.
-const COLOR = { danger: '#FF5C5C', caution: '#F5B942', safe: '#22B8FF' }
+// Safe cells read as chart blue so green stays exclusive to PFZ.
+const COLOR = { danger: SIGNAL.danger, caution: SIGNAL.caution, safe: CHART.route }
 
 const validBounds = (b) =>
   Array.isArray(b) &&
@@ -32,7 +33,7 @@ export default function SeaStateLayer({ grid = [] }) {
           }}
         >
           <Tooltip direction="center" opacity={1}>
-            <span className="font-mono text-[10px]">
+            <span className="font-mono text-meta">
               {c.label}
               {isNum(c.sst) ? ` · SST ${c.sst}°` : ''}
               {isNum(c.wave) ? ` · ${c.wave} m` : ''}

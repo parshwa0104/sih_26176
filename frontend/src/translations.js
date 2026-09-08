@@ -77,6 +77,8 @@ export const UI_STRINGS = {
     zoomIn: 'Zoom in', zoomOut: 'Zoom out',
     legendPfz: 'Fishing zone', legendSafe: 'Safe', legendCaution: 'Caution',
     legendDanger: 'Danger',
+    legendVessel: 'Your vessel', legendRoute: 'Route', legendHazard: 'Hazard zone',
+    seaCalm: 'Calm', seaModerate: 'Moderate', seaRough: 'Rough',
 
     // Ask ORCA
     askTitle: 'Ask ORCA',

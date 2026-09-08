@@ -7,23 +7,25 @@
    ORCA — Ocean Operations Center · design tokens
    ============================================================ */
 :root {
-  --ocean-900: #F0F4F8;
-  --ocean-850: #FFFFFF;
-  --ocean-800: #E2E8F0;
+  /* Mirrors the colour tokens in tailwind.config.js — keep in sync. */
+  --ocean-900: #EEF2F1;
+  --ocean-850: #FBFCFB;
+  --ocean-800: #DFE6E4;
   --surface-1: #FFFFFF;
-  --surface-2: #F8FAFC;
-  --surface-3: #F1F5F9;
-  --accent: #0369A1;
-  --accent-bright: #0284C7;
-  --accent-deep: #0C4A6E;
-  --marine: #0F766E;
-  --safe: #15803D;
-  --caution: #B45309;
-  --danger: #B91C1C;
-  --ink: #0F172A;
-  --ink-dim: #475569;
-  --hairline: rgba(0, 0, 0, 0.15);
-  --hairline-strong: rgba(0, 0, 0, 0.25);
+  --surface-2: #F4F7F6;
+  --surface-3: #EAEFED;
+  --accent: #0B6472;
+  --accent-bright: #0E7E8A;
+  --accent-deep: #08414A;
+  --marine: #0C6B5A;
+  --safe: #0C7A5A;
+  --caution: #96610F;
+  --danger: #B0271C;
+  --ink: #0F1E1C;
+  --ink-dim: #4A5D5A;
+  --ink-mute: #7C8F8B;
+  --hairline: rgba(8, 26, 24, 0.14);
+  --hairline-strong: rgba(8, 26, 24, 0.24);
   color-scheme: light;
 }
 
@@ -34,6 +36,10 @@ html, body, #root {
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Matches the `body` type token (see tailwind.config.js). */
+  font-size: 0.8125rem;
+  line-height: 1.1875rem;
+  letter-spacing: 0;
   background-color: var(--ocean-900);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
@@ -49,9 +55,9 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(1200px 620px at 12% -12%, rgba(3, 105, 161, 0.05), transparent 60%),
-    radial-gradient(900px 520px at 112% 118%, rgba(15, 118, 110, 0.04), transparent 60%),
-    repeating-radial-gradient(circle at 14% 22%, rgba(0, 0, 0, 0.02) 0 1px, transparent 1px 46px);
+    radial-gradient(1200px 620px at 12% -12%, rgba(11, 100, 114, 0.05), transparent 60%),
+    radial-gradient(900px 520px at 112% 118%, rgba(12, 122, 90, 0.035), transparent 60%),
+    repeating-radial-gradient(circle at 14% 22%, rgba(8, 26, 24, 0.02) 0 1px, transparent 1px 46px);
 }
 
 /* Focus visibility */
@@ -64,14 +70,14 @@ body {
 /* Scrollbars */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(54, 207, 255, 0.25) transparent;
+  scrollbar-color: rgba(11, 100, 114, 0.30) transparent;
 }
 *::-webkit-scrollbar { width: 8px; height: 8px; }
-*::-webkit-scrollbar-thumb { background: rgba(54, 207, 255, 0.22); border-radius: 8px; }
+*::-webkit-scrollbar-thumb { background: rgba(11, 100, 114, 0.24); border-radius: 8px; }
 *::-webkit-scrollbar-track { background: transparent; }
 
 /* ============================================================
-   Leaflet — dark ocean chart theme
+   Leaflet — light ocean chart
    ============================================================ */
 .leaflet-container {
   width: 100%;
@@ -81,56 +87,73 @@ body {
   z-index: 0;
 }
 
-/* Keep true map colours and just boost contrast slightly. */
+/* Chart-style basemap: pull the raster OSM tiles most of the way to a
+   monochrome bathymetric sheet — desaturated, low-contrast, shifted cool
+   — so the coloured vector layers carry all the signal. Vectors and
+   markers live in other panes and are untouched. */
 .leaflet-tile-pane {
-  filter: contrast(1.05) brightness(1.02);
+  filter: grayscale(0.55) saturate(0.5) brightness(1.07) contrast(0.88)
+    sepia(0.14) hue-rotate(150deg);
 }
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
   background: var(--surface-1);
   color: var(--ink);
   border: 1px solid var(--hairline-strong);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 10px 30px rgba(8, 26, 24, 0.16);
 }
-.leaflet-popup-content-wrapper { border-radius: 10px; }
-.leaflet-popup-content { margin: 9px 12px; font-size: 12px; line-height: 1.45; }
-.leaflet-container a.leaflet-popup-close-button { color: var(--ink-dim); }
-.leaflet-container a.leaflet-popup-close-button:hover { color: var(--ink); }
+.leaflet-popup-content-wrapper { border-radius: 12px; }
+.leaflet-popup-content { margin: 0; font-size: 12px; line-height: 1.45; }
+.leaflet-popup-content p { margin: 0; }
+.leaflet-container a.leaflet-popup-close-button {
+  color: var(--ink-mute);
+  width: 26px;
+  height: 26px;
+  font-size: 18px;
+  padding: 3px 0 0 0;
+}
+.leaflet-container a.leaflet-popup-close-button:hover { color: var(--ink); background: transparent; }
 .leaflet-tooltip {
   background: var(--surface-1);
   border: 1px solid var(--hairline-strong);
   color: var(--ink);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 6px 18px rgba(8, 26, 24, 0.14);
   border-radius: 7px;
   font-size: 11px;
-  padding: 4px 8px;
+  padding: 3px 7px;
+  font-weight: 500;
 }
 .leaflet-tooltip-top::before { border-top-color: var(--hairline-strong); }
 .leaflet-control-attribution {
-  background: rgba(3, 21, 37, 0.72) !important;
-  color: #6b86a3 !important;
+  background: rgba(251, 252, 251, 0.82) !important;
+  color: var(--ink-mute) !important;
   font-size: 10px !important;
   backdrop-filter: blur(4px);
 }
 .leaflet-control-attribution a { color: var(--accent) !important; }
 
-/* Map markers (Leaflet divIcon) */
+/* Map markers — SVG divIcons (see src/lib/mapIcons.js). */
 .orca-marker { background: transparent; border: 0; }
-.orca-dot {
-  position: relative;
-  display: block;
-  width: 14px;
-  height: 14px;
-  border-radius: 9999px;
-  border: 2px solid #FFFFFF;
-}
+.orca-marker svg { display: block; filter: drop-shadow(0 1px 2px rgba(8, 26, 24, 0.4)); }
+
+/* Hazard ping — the one looping marker animation, reserved for "look here". */
 .orca-dot-ping {
   position: absolute;
-  inset: -5px;
+  inset: -6px;
   border-radius: 9999px;
   border: 2px solid;
-  opacity: 0.6;
-  animation: orca-ping 2.4s ease-out infinite;
+  opacity: 0.5;
+  animation: orca-ping 2.8s ease-out infinite;
+}
+
+/* One-shot ring dropped where a query result lands on the chart. */
+.orca-arrival {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  border: 2px solid var(--accent);
+  animation: ping-once 1.2s ease-out 2 both;
 }
 
 /* ============================================================

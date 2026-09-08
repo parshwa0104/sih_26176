@@ -39,7 +39,7 @@ export default function LanguageMenu({ lang, onChange }) {
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label="Select language"
-        className="flex h-10 items-center gap-1.5 rounded-lg border border-hairline bg-surface-1/60 px-2.5 text-xs font-semibold text-ink transition-colors hover:border-hairline-strong"
+        className="flex h-10 items-center gap-field rounded-lg border border-hairline bg-surface-1/60 px-2.5 text-label text-ink transition-colors hover:border-hairline-strong"
       >
         <Globe size={14} className="text-accent" />
         <span className="min-w-[20px] text-center">{lang}</span>
@@ -61,13 +61,13 @@ export default function LanguageMenu({ lang, onChange }) {
                   setOpen(false)
                 }}
                 className={cx(
-                  'flex w-full items-center justify-between px-3 py-2 text-left text-sm transition-colors hover:bg-black/5',
+                  'flex w-full items-center justify-between px-3 py-2 text-left text-body transition-colors hover:bg-black/5',
                   code === lang ? 'text-accent' : 'text-ink-dim',
                 )}
               >
                 <span>
                   <span className="font-semibold text-ink">{code}</span>
-                  <span className="ml-2 text-xs text-ink-dim">{FULL[code]}</span>
+                  <span className="ml-2 text-caption text-ink-dim">{FULL[code]}</span>
                 </span>
                 {code === lang && <Check size={14} />}
               </button>

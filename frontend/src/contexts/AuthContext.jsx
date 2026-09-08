@@ -109,7 +109,7 @@ export function AuthProvider({ children }) {
 function AuthSplash() {
   return (
     <div className="grid min-h-[100dvh] w-full place-items-center bg-ocean-900">
-      <span className="font-display text-lg font-bold uppercase tracking-[0.32em] text-ink-dim">
+      <span className="font-display text-readout font-bold uppercase tracking-[0.18em] text-ink-dim">
         ORCA
       </span>
     </div>

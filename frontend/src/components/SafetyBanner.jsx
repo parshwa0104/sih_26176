@@ -1,30 +1,31 @@
 import { ShieldCheck, ShieldAlert, AlertTriangle, HelpCircle } from 'lucide-react'
 import Skeleton from './Skeleton'
 import { cx } from '../lib/format'
+import { SIGNAL } from '../lib/chartColors'
 
 const CONF = {
   safe: {
     wordKey: 'safe',
-    color: '#2EE6A6',
+    color: SIGNAL.safe,
     Icon: ShieldCheck,
     grad: 'from-status-safe/12',
   },
   caution: {
     wordKey: 'caution',
-    color: '#F5B942',
+    color: SIGNAL.caution,
     Icon: AlertTriangle,
     grad: 'from-status-caution/12',
   },
   danger: {
     wordKey: 'danger',
-    color: '#FF5C5C',
+    color: SIGNAL.danger,
     Icon: ShieldAlert,
     grad: 'from-status-danger/16',
     pulse: true,
   },
   unknown: {
     wordKey: 'safetyUnknown',
-    color: '#9DB8D0',
+    color: SIGNAL.unknown,
     Icon: HelpCircle,
     grad: 'from-black/5',
   },
@@ -82,26 +83,26 @@ export default function SafetyBanner({ status, locationLabel, advisory, updated,
       <div className="min-w-0">
         <div className="flex items-baseline gap-2">
           <span
-            className="font-display text-lg font-bold uppercase leading-none tracking-[0.16em] lg:text-2xl"
+            className="font-display text-readout font-bold uppercase leading-none tracking-[0.04em] lg:text-readout-lg"
             style={{ color: c.color }}
           >
             {word}
           </span>
           {locationLabel && (
-            <span className="truncate text-xs text-ink-dim lg:text-sm">
+            <span className="truncate text-caption text-ink-dim lg:text-body">
               {t.near} <span className="font-semibold text-ink">{locationLabel}</span>
             </span>
           )}
         </div>
         {advisory && (
-          <p className="mt-0.5 truncate text-[11px] text-ink-dim lg:text-xs [@media(max-height:480px)]:hidden">
+          <p className="mt-0.5 truncate text-caption text-ink-dim [@media(max-height:480px)]:hidden">
             {advisory}
           </p>
         )}
       </div>
 
       {updated && (
-        <div className="ml-auto hidden shrink-0 text-right font-mono text-[10px] uppercase tracking-wider text-ink-dim md:block [@media(max-height:480px)]:hidden">
+        <div className="ml-auto hidden shrink-0 text-right font-mono text-meta uppercase text-ink-dim md:block [@media(max-height:480px)]:hidden">
           <span className="block">{t.lastUpdate}</span>
           <span className="text-ink">{updated}</span>
         </div>

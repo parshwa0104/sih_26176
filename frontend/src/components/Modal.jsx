@@ -22,10 +22,8 @@ export default function Modal({ title, onClose, closeLabel = 'Close', children }
         aria-label={title}
         className="relative w-full max-w-md animate-fade-up overflow-hidden rounded-2xl border border-hairline-strong bg-ocean-850 shadow-inst"
       >
-        <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
-          <h2 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-ink">
-            {title}
-          </h2>
+        <div className="flex items-center justify-between border-b border-hairline px-panel py-stack">
+          <h2 className="font-display text-label uppercase text-ink">{title}</h2>
           <button
             type="button"
             onClick={onClose}
@@ -35,7 +33,7 @@ export default function Modal({ title, onClose, closeLabel = 'Close', children }
             <X size={18} />
           </button>
         </div>
-        <div className="max-h-[70vh] overflow-y-auto p-4">{children}</div>
+        <div className="max-h-[70vh] overflow-y-auto p-panel">{children}</div>
       </div>
     </div>
   )

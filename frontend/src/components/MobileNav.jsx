@@ -17,14 +17,14 @@ function BarButton({ item, active, alertCount, t, onNav }) {
       aria-current={item.kind === 'view' && active ? 'page' : undefined}
       aria-pressed={item.kind === 'toggle' ? active : undefined}
       className={cx(
-        'relative flex flex-1 flex-col items-center gap-0.5 rounded-lg px-2 py-1.5 text-[10px] font-medium transition-colors',
+        'relative flex flex-1 flex-col items-center gap-0.5 rounded-lg px-2 py-1.5 text-label transition-colors',
         active ? 'text-accent' : 'text-ink-dim',
       )}
     >
       <Icon size={20} strokeWidth={1.75} />
-      <span className="tracking-wide">{t[item.labelKey]}</span>
+      <span>{t[item.labelKey]}</span>
       {item.id === 'alerts' && alertCount > 0 && (
-        <span className="absolute right-1/4 top-0 grid h-4 min-w-[16px] place-items-center rounded-full bg-status-danger px-1 text-[9px] font-bold text-white">
+        <span className="absolute right-1/4 top-0 grid h-4 min-w-[16px] place-items-center rounded-full bg-status-danger px-1 text-meta font-bold text-white">
           {alertCount}
         </span>
       )}
@@ -58,12 +58,12 @@ export default function MobileNav({ navState, onNav, alertCount = 0, t }) {
           aria-haspopup="menu"
           aria-expanded={moreActive}
           className={cx(
-            'flex flex-1 flex-col items-center gap-0.5 rounded-lg px-2 py-1.5 text-[10px] font-medium transition-colors',
+            'flex flex-1 flex-col items-center gap-0.5 rounded-lg px-2 py-1.5 text-label transition-colors',
             moreActive ? 'text-accent' : 'text-ink-dim',
           )}
         >
           <MoreHorizontal size={20} strokeWidth={1.75} />
-          <span className="tracking-wide">{t.navMore || 'More'}</span>
+          <span>{t.navMore || 'More'}</span>
         </button>
       )}
     </nav>
