@@ -13,15 +13,24 @@ const SEV = {
 const ICON_BY_ID = { pfz: Fish, cond: TrendingUp, wind: WavesIcon, safety: ShieldAlert, alert: Bell }
 
 /** AI insights — a scannable list derived from live data, each row actionable. */
-export default function AIInsights({ insights = [], loading, onAction, t, className = '' }) {
+export default function AIInsights({
+  insights = [],
+  loading,
+  onAction,
+  t,
+  className = '',
+  hideHeader = false,
+}) {
   return (
     <section className={cx('border-b border-hairline p-4', className)} aria-label={t.insightsTitle}>
-      <div className="flex items-center gap-2">
-        <Sonar size={16} active={false} />
-        <h2 className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-ink">
-          {t.insightsTitle}
-        </h2>
-      </div>
+      {!hideHeader && (
+        <div className="flex items-center gap-2">
+          <Sonar size={16} active={false} />
+          <h2 className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-ink">
+            {t.insightsTitle}
+          </h2>
+        </div>
+      )}
 
       {loading ? (
         <div className="mt-3 space-y-2">

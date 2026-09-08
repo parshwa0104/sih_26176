@@ -9,19 +9,35 @@ const KIND = {
 }
 
 /** Alerts panel driven by GET /conditions -> alerts[]. */
-export default function AlertsPanel({ alerts = [], loading, t, className = '' }) {
+export default function AlertsPanel({
+  alerts = [],
+  loading,
+  t,
+  className = '',
+  pulse = false,
+  hideHeader = false,
+}) {
   return (
-    <section className={cx('p-4', className)} aria-label={t.alertsTitle}>
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-ink">
-          {t.alertsTitle}
-        </h2>
-        {alerts.length > 0 && (
-          <span className="rounded-full bg-status-danger/15 px-2 py-0.5 text-[10px] font-bold text-status-danger">
-            {alerts.length}
-          </span>
-        )}
-      </div>
+    <section
+      className={cx(
+        'p-4 rounded-xl transition-shadow duration-500',
+        pulse && 'ring-2 ring-accent/60',
+        className,
+      )}
+      aria-label={t.alertsTitle}
+    >
+      {!hideHeader && (
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-ink">
+            {t.alertsTitle}
+          </h2>
+          {alerts.length > 0 && (
+            <span className="rounded-full bg-status-danger/15 px-2 py-0.5 text-[10px] font-bold text-status-danger">
+              {alerts.length}
+            </span>
+          )}
+        </div>
+      )}
 
       {loading ? (
         <div className="mt-3 space-y-2">

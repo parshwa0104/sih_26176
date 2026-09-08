@@ -1,7 +1,7 @@
 import Sonar from './Sonar'
 import StatusDot from './StatusDot'
 import { LogOut } from 'lucide-react'
-import { NAV_ITEMS } from '../lib/nav'
+import { NAV_ITEMS, isNavActive } from '../lib/nav'
 import { cx } from '../lib/format'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -11,8 +11,22 @@ const STATUS_LABEL = {
   connecting: 'systemConnecting',
 }
 
+// ARIA that matches what each item actually does (see lib/nav.js `kind`).
+function ariaFor(item, active) {
+  switch (item.kind) {
+    case 'view':
+      return { 'aria-current': active ? 'page' : undefined }
+    case 'toggle':
+      return { 'aria-pressed': active }
+    case 'dialog':
+      return { 'aria-haspopup': 'dialog', 'aria-expanded': active }
+    default:
+      return {}
+  }
+}
+
 /** Desktop navigation rail — "navigation equipment", not a SaaS sidebar. */
-export default function Sidebar({ activeNav, onNav, systemStatus = 'connecting', alertCount = 0, t }) {
+export default function Sidebar({ navState, onNav, systemStatus = 'connecting', alertCount = 0, t }) {
   const { logout } = useAuth()
 
   return (
@@ -31,19 +45,19 @@ export default function Sidebar({ activeNav, onNav, systemStatus = 'connecting',
       <ul className="mt-6 flex flex-1 flex-col items-center gap-1.5">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon
-          const active = activeNav === item.id
+          const active = isNavActive(item, navState)
           return (
             <li key={item.id} className="relative">
               {active && (
                 <span
                   aria-hidden="true"
-                  className="absolute -left-4 top-1/2 h-8 w-[3px] -translate-y-1/2 rounded-r-full bg-accent shadow-[0_0_12px_rgba(54,207,255,0.7)]"
+                  className="absolute -left-3 top-1/2 h-8 w-[3px] -translate-y-1/2 rounded-r-full bg-accent"
                 />
               )}
               <button
                 type="button"
                 onClick={() => onNav(item.id)}
-                aria-current={active ? 'page' : undefined}
+                {...ariaFor(item, active)}
                 title={t[item.labelKey]}
                 className={cx(
                   'group relative grid h-12 w-12 place-items-center rounded-xl border transition-colors',
@@ -55,7 +69,7 @@ export default function Sidebar({ activeNav, onNav, systemStatus = 'connecting',
                 <Icon size={20} strokeWidth={1.75} />
                 <span className="sr-only">{t[item.labelKey]}</span>
                 {item.id === 'alerts' && alertCount > 0 && (
-                  <span className="absolute -right-1 -top-1 grid h-4 min-w-[16px] place-items-center rounded-full bg-status-danger px-1 text-[10px] font-bold text-ocean-900">
+                  <span className="absolute -right-1 -top-1 grid h-4 min-w-[16px] place-items-center rounded-full bg-status-danger px-1 text-[10px] font-bold text-white">
                     {alertCount}
                   </span>
                 )}
@@ -69,8 +83,9 @@ export default function Sidebar({ activeNav, onNav, systemStatus = 'connecting',
         <button
           type="button"
           onClick={logout}
-          className="group relative grid h-12 w-12 place-items-center rounded-xl border border-transparent text-status-danger transition-colors hover:bg-status-danger/10"
-          aria-label="Log Out"
+          className="grid h-12 w-12 place-items-center rounded-xl border border-transparent text-status-danger transition-colors hover:bg-status-danger/10"
+          aria-label={t.logout || 'Log out'}
+          title={t.logout || 'Log out'}
         >
           <LogOut size={20} strokeWidth={1.75} />
         </button>

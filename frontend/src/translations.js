@@ -41,6 +41,7 @@ export const UI_STRINGS = {
     // Navigation
     navHome: 'Home', navMap: 'Ocean Map', navAsk: 'Ask ORCA',
     navAlerts: 'Alerts', navReports: 'Reports', navSettings: 'Settings',
+    navMore: 'More', logout: 'Log out',
 
     // Header / identity
     productName: 'Ocean Operations Center',

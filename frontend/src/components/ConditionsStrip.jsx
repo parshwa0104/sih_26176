@@ -34,7 +34,14 @@ function Readout({ icon: Icon, label, value, gauge }) {
 }
 
 /** Ocean conditions readout panel — instrument styling, strong number hierarchy. */
-export default function ConditionsStrip({ conditions, safetyStatus, loading, t, className = '' }) {
+export default function ConditionsStrip({
+  conditions,
+  safetyStatus,
+  loading,
+  t,
+  className = '',
+  hideHeader = false,
+}) {
   if (loading) {
     return (
       <section className={cx('border-b border-hairline p-4', className)}>
@@ -66,16 +73,18 @@ export default function ConditionsStrip({ conditions, safetyStatus, loading, t, 
 
   return (
     <section className={cx('border-b border-hairline p-4', className)} aria-label={t.conditionsTitle}>
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-ink">
-          {t.conditionsTitle}
-        </h2>
-        {conditions.location && (
-          <span className="flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-ink-dim">
-            {conditions.location}
-          </span>
-        )}
-      </div>
+      {!hideHeader && (
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-ink">
+            {t.conditionsTitle}
+          </h2>
+          {conditions.location && (
+            <span className="flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-ink-dim">
+              {conditions.location}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Primary readout: SST */}
       <div className="mt-3 rounded-xl border border-hairline bg-surface-1/50 p-3">

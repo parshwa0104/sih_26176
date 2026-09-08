@@ -53,7 +53,7 @@ export default function ReportPanel({ conditions, pfzZones = [], safetyStatus, t
     <Modal title={t.reportTitle} onClose={onClose} closeLabel={t.close}>
       <dl className="divide-y divide-hairline">
         {rows.map(([k, v]) => (
-          <div key={k} className="grid grid-cols-[110px_1fr] gap-3 py-2.5">
+          <div key={k} className="grid grid-cols-[92px_1fr] gap-3 py-2.5 sm:grid-cols-[110px_1fr]">
             <dt className="font-mono text-[10px] uppercase tracking-wider text-ink-dim">{k}</dt>
             <dd className="text-sm text-ink">{v}</dd>
           </div>
@@ -73,7 +73,7 @@ export default function ReportPanel({ conditions, pfzZones = [], safetyStatus, t
       <button
         type="button"
         onClick={copy}
-        className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-hairline px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-black/5"
+        className="mt-4 inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-hairline px-3.5 py-2 text-xs font-semibold text-accent transition-colors hover:bg-black/5"
       >
         {copied ? <Check size={13} /> : <Copy size={13} />}
         {copied ? t.copied : t.copyBrief}

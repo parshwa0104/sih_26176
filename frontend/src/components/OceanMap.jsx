@@ -56,7 +56,7 @@ export default function OceanMap({
   const [map, setMap] = useState(null)
 
   const ctrlBtn =
-    'grid h-9 w-9 place-items-center text-ink-dim transition-colors hover:bg-black/5 hover:text-ink disabled:opacity-30'
+    'grid h-10 w-10 place-items-center text-ink-dim transition-colors hover:bg-black/5 hover:text-ink disabled:opacity-30'
 
   return (
     <div className="absolute inset-0">

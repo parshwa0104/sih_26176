@@ -83,7 +83,12 @@ const AskOrca = forwardRef(function AskOrca({ onSubmit, loading, lang, t, classN
           <Send size={18} />
         </button>
       </div>
-      <p className="mt-1 truncate px-2 text-[10px] font-mono uppercase tracking-[0.14em] text-ink-dim/70">
+      <p
+        className={cx(
+          'mt-1 truncate px-2 text-[10px] font-mono uppercase tracking-[0.14em] text-ink-dim/70',
+          !listening && 'hidden sm:block [@media(max-height:480px)]:hidden',
+        )}
+      >
         {listening ? t.listening : t.askHint}
       </p>
     </form>

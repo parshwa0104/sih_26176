@@ -54,7 +54,7 @@ export default function Header({
           type="button"
           onClick={onBell}
           aria-label={t.alertsTitle}
-          className="relative grid h-9 w-9 place-items-center rounded-lg border border-hairline bg-surface-1/50 text-ink-dim transition-colors hover:text-ink"
+          className="relative grid h-10 w-10 place-items-center rounded-lg border border-hairline bg-surface-1/50 text-ink-dim transition-colors hover:text-ink"
         >
           <Bell size={17} />
           {alertCount > 0 && (

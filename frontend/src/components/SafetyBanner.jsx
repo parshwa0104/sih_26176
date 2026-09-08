@@ -54,7 +54,7 @@ export default function SafetyBanner({ status, locationLabel, advisory, updated,
       role="status"
       aria-label={`${word} ${locationLabel ? `${t.near} ${locationLabel}` : ''}`}
       className={cx(
-        'relative flex shrink-0 items-center gap-3.5 border-b border-hairline bg-gradient-to-r to-transparent px-4 py-3 lg:gap-4 lg:px-6',
+        'relative flex shrink-0 items-center gap-3 border-b border-hairline bg-gradient-to-r to-transparent px-4 py-2.5 lg:gap-4 lg:px-6 lg:py-3 [@media(max-height:480px)]:py-1.5',
         c.grad,
       )}
     >
@@ -65,7 +65,7 @@ export default function SafetyBanner({ status, locationLabel, advisory, updated,
       />
 
       {/* Status light */}
-      <span className="relative grid h-10 w-10 shrink-0 place-items-center">
+      <span className="relative grid h-9 w-9 shrink-0 place-items-center lg:h-10 lg:w-10">
         <span
           className="absolute inset-0 rounded-full opacity-20"
           style={{ background: c.color }}
@@ -94,12 +94,14 @@ export default function SafetyBanner({ status, locationLabel, advisory, updated,
           )}
         </div>
         {advisory && (
-          <p className="mt-0.5 truncate text-[11px] text-ink-dim lg:text-xs">{advisory}</p>
+          <p className="mt-0.5 truncate text-[11px] text-ink-dim lg:text-xs [@media(max-height:480px)]:hidden">
+            {advisory}
+          </p>
         )}
       </div>
 
       {updated && (
-        <div className="ml-auto hidden shrink-0 text-right font-mono text-[10px] uppercase tracking-wider text-ink-dim md:block">
+        <div className="ml-auto hidden shrink-0 text-right font-mono text-[10px] uppercase tracking-wider text-ink-dim md:block [@media(max-height:480px)]:hidden">
           <span className="block">{t.lastUpdate}</span>
           <span className="text-ink">{updated}</span>
         </div>

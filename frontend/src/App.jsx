@@ -5,6 +5,7 @@ import { UI_STRINGS, LANG_CODES, LANG_FULL } from './translations'
 import { getConditions, getPfzZones, getSeaState, sendQuery } from './api/client'
 import { deriveInsights } from './lib/insights'
 import { isNum } from './lib/format'
+import { NAV_ITEMS } from './lib/nav'
 import { useMediaQuery } from './hooks/useMediaQuery'
 import { useReducedMotion } from './hooks/useReducedMotion'
 
@@ -148,10 +149,21 @@ export default function App() {
   const investigation = useInvestigation()
 
   /* ── UI shell state ── */
-  const [activeNav, setActiveNav] = useState('home')
-  const [mobileSheet, setMobileSheet] = useState(null) // response | zone | conditions | insights | alerts
+  const [activeNav, setActiveNav] = useState('home') // 'home' | 'map' — the only persistent views
+  const [mobileSheet, setMobileSheet] = useState(null) // response | zone | conditions | insights | alerts | more
   const [modal, setModal] = useState(null) // reports | settings
   const askInputRef = useRef(null)
+  const alertsRef = useRef(null)
+  const pulseTimer = useRef(null)
+  const [alertsPulse, setAlertsPulse] = useState(false)
+  useEffect(() => () => window.clearTimeout(pulseTimer.current), [])
+
+  const clearDrawer = useCallback(() => {
+    setResponse(null)
+    setSelectedZone(null)
+    setQError(null)
+    setQueryMapData(null)
+  }, [])
 
   /* ── Derived ── */
   const alerts = conditions?.alerts || []
@@ -195,7 +207,6 @@ export default function App() {
       setResponse(null)
       setQueryMapData(null)
       setQLoading(true)
-      setActiveNav('ask')
       if (isMobile) setMobileSheet('response')
       investigation.start(q)
 
@@ -272,42 +283,64 @@ export default function App() {
     }
   }, [])
 
+  // Desktop "Alerts": the panel is always mounted in the right column, so this
+  // reveals it in place (scroll + brief pulse) rather than opening a fake page.
+  const flashAlerts = useCallback(() => {
+    setActiveNav('home') // make sure the right column is visible (not map-focus)
+    setModal(null)
+    setAlertsPulse(true)
+    window.clearTimeout(pulseTimer.current)
+    pulseTimer.current = window.setTimeout(() => setAlertsPulse(false), 1600)
+    requestAnimationFrame(() =>
+      alertsRef.current?.scrollIntoView({
+        block: 'nearest',
+        behavior: reducedMotion ? 'auto' : 'smooth',
+      }),
+    )
+  }, [reducedMotion])
+
   const handleNav = useCallback(
     (id) => {
-      if (id === 'reports') {
-        setModal('reports')
-        setActiveNav('reports')
-        return
-      }
-      if (id === 'settings' || id === 'more') {
-        setModal('settings')
-        setActiveNav('settings')
-        return
-      }
-      setActiveNav(id)
-      if (id === 'alerts') {
-        setMobileSheet(isMobile ? 'alerts' : null)
-      } else if (id === 'ask') {
-        setMobileSheet(null)
-        setTimeout(() => askInputRef.current?.focus(), 0)
-      } else {
-        setMobileSheet(null)
+      switch (id) {
+        case 'home': // reset to the default dashboard
+          setActiveNav('home')
+          setModal(null)
+          setMobileSheet(null)
+          clearDrawer()
+          break
+        case 'map': // real toggle — fill the map / restore the dashboard
+          setModal(null)
+          setMobileSheet(null)
+          setActiveNav((v) => (v === 'map' ? 'home' : 'map'))
+          break
+        case 'alerts':
+          if (isMobile) {
+            setModal(null)
+            setMobileSheet('alerts')
+          } else {
+            flashAlerts()
+          }
+          break
+        case 'reports':
+          setMobileSheet(null)
+          setModal('reports')
+          break
+        case 'settings':
+          setMobileSheet(null)
+          setModal('settings')
+          break
+        case 'more': // mobile: sheet listing the 'more'-slot nav items
+          setModal(null)
+          setMobileSheet('more')
+          break
+        default:
+          break
       }
     },
-    [isMobile],
+    [isMobile, clearDrawer, flashAlerts],
   )
 
-  const closeModal = useCallback(() => {
-    setModal(null)
-    setActiveNav((a) => (a === 'reports' || a === 'settings' ? 'home' : a))
-  }, [])
-
-  const clearDrawer = useCallback(() => {
-    setResponse(null)
-    setSelectedZone(null)
-    setQError(null)
-    setQueryMapData(null)
-  }, [])
+  const closeModal = useCallback(() => setModal(null), [])
 
   /* ── Drawer content (shared desktop drawer + mobile sheet) ── */
   const drawerActive = qLoading || qError || response || selectedZone
@@ -329,19 +362,17 @@ export default function App() {
     ) : null
 
   const sheetTitle =
-    mobileSheet === 'response'
-      ? t.orcaAnswer
-      : mobileSheet === 'zone'
-        ? t.legendPfz
-        : mobileSheet === 'conditions'
-          ? t.conditionsTitle
-          : mobileSheet === 'insights'
-            ? t.insightsTitle
-            : mobileSheet === 'alerts'
-              ? t.alertsTitle
-              : ''
+    {
+      response: t.orcaAnswer,
+      zone: t.legendPfz,
+      conditions: t.conditionsTitle,
+      insights: t.insightsTitle,
+      alerts: t.alertsTitle,
+      more: t.navMore,
+    }[mobileSheet] || ''
 
   const mapFocus = activeNav === 'map'
+  const navState = { view: activeNav, modal, mapFocus, mobileSheet }
 
   if (!currentUser) {
     return <Login />
@@ -350,7 +381,7 @@ export default function App() {
   return (
     <div className="orca-bg relative flex h-[100dvh] w-full overflow-hidden bg-ocean-900 font-sans text-ink">
       <Sidebar
-        activeNav={activeNav}
+        navState={navState}
         onNav={handleNav}
         systemStatus={systemStatus}
         alertCount={alerts.length}
@@ -441,8 +472,9 @@ export default function App() {
               <div className="text-ink">{fmtReadout(readout)}</div>
             </div>
 
-            {/* Command console + response drawer */}
-            <div className="absolute inset-x-2 bottom-[74px] z-[600] flex flex-col gap-2 sm:inset-x-3 lg:inset-x-auto lg:bottom-6 lg:left-6 lg:w-[min(640px,52vw)]">
+            {/* Command console + response drawer. On mobile it sits clear above
+                the bottom nav (bar height + safe-area inset). */}
+            <div className="absolute inset-x-2 bottom-[calc(72px+env(safe-area-inset-bottom,0px))] z-[600] flex flex-col gap-2 sm:inset-x-3 lg:inset-x-auto lg:bottom-6 lg:left-6 lg:w-[min(640px,52vw)]">
               {drawerActive && !qLoading && drawerContent && (
                 <div className="hidden max-h-[46vh] animate-fade-up overflow-y-auto rounded-2xl border border-hairline-strong bg-ocean-850/95 p-4 shadow-inst backdrop-blur lg:block">
                   <div className="mb-2 flex justify-end">
@@ -488,14 +520,21 @@ export default function App() {
               loading={dashLoading && !conditions}
               t={t}
             />
-            <AlertsPanel alerts={alerts} loading={dashLoading && !conditions} t={t} />
+            <div ref={alertsRef}>
+              <AlertsPanel
+                alerts={alerts}
+                loading={dashLoading && !conditions}
+                pulse={alertsPulse}
+                t={t}
+              />
+            </div>
           </aside>
         </div>
       </div>
 
       {/* ── Mobile navigation + sheet ── */}
       <MobileNav
-        activeNav={activeNav}
+        navState={navState}
         onNav={handleNav}
         alertCount={alerts.length}
         t={t}
@@ -515,6 +554,7 @@ export default function App() {
             loading={dashLoading && !conditions}
             t={t}
             className="border-0 p-0"
+            hideHeader
           />
         )}
         {mobileSheet === 'insights' && (
@@ -524,11 +564,19 @@ export default function App() {
             onAction={handleInsightAction}
             t={t}
             className="border-0 p-0"
+            hideHeader
           />
         )}
         {mobileSheet === 'alerts' && (
-          <AlertsPanel alerts={alerts} loading={dashLoading && !conditions} t={t} className="p-0" />
+          <AlertsPanel
+            alerts={alerts}
+            loading={dashLoading && !conditions}
+            t={t}
+            className="p-0"
+            hideHeader
+          />
         )}
+        {mobileSheet === 'more' && <MoreSheet onNav={handleNav} t={t} />}
       </BottomSheet>
 
       {modal === 'reports' && (
@@ -557,6 +605,29 @@ export default function App() {
 
 /* ── Small local pieces ── */
 
+/** Contents of the mobile "More" sheet — the nav items that don't fit the bar. */
+function MoreSheet({ onNav, t }) {
+  return (
+    <ul className="space-y-2">
+      {NAV_ITEMS.filter((i) => i.slot === 'more').map((item) => {
+        const Icon = item.icon
+        return (
+          <li key={item.id}>
+            <button
+              type="button"
+              onClick={() => onNav(item.id)}
+              className="flex w-full items-center gap-3 rounded-xl border border-hairline bg-surface-1/40 px-3 py-3 text-left text-sm font-semibold text-ink transition-colors hover:bg-black/5"
+            >
+              <Icon size={18} className="text-ink-dim" />
+              {t[item.labelKey]}
+            </button>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
 function LayerToggle({ active, onClick, dot, label }) {
   return (
     <button
@@ -564,7 +635,7 @@ function LayerToggle({ active, onClick, dot, label }) {
       onClick={onClick}
       aria-pressed={active}
       className={
-        'flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ' +
+        'flex min-h-[38px] w-full items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-semibold transition-colors ' +
         (active ? 'text-ink' : 'text-ink-dim hover:text-ink')
       }
     >
