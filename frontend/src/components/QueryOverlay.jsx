@@ -76,6 +76,17 @@ export default function QueryOverlay({ data, t }) {
     )
   }
 
+  // ── Weather ──
+  if (data.type === 'weather' && isNum(data.lat) && isNum(data.lng)) {
+    return (
+      <Marker position={[data.lat, data.lng]} icon={waypointIcon}>
+        <Popup>
+          <b>{t.conditionsTitle}</b>
+        </Popup>
+      </Marker>
+    )
+  }
+
   // ── Route ──
   if (data.type === 'route' && Array.isArray(data.waypoints)) {
     const pts = data.waypoints.filter((w) => w && isNum(w.lat) && isNum(w.lng))
