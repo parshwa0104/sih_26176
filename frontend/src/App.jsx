@@ -192,7 +192,10 @@ export default function App() {
 
       const full = LANG_FULL[lang] || 'english'
       try {
-        const data = await sendQuery(`${q} (reply in ${full})`)
+        const data =await sendQuery(message, {
+  onToken: (token) => setAnswer((prev) => prev + token),
+  onDone: (final) => setMapData(final.map_data),
+})
         setResponse(data)
         const md = data?.map_data || null
         setQueryMapData(md)

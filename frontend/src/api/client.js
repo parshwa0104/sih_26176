@@ -1,6 +1,3 @@
-// ORCA backend client.
-// Base URL is configurable via VITE_API_BASE; falls back to the local dev backend.
-
 export const API_BASE = (
   import.meta.env.VITE_API_BASE || 'http://localhost:8000'
 ).replace(/\/+$/, '')
@@ -22,24 +19,62 @@ export const getPfzZones = () => getJSON('/pfz-zones')
 export const getSeaState = () => getJSON('/sea-state')
 
 /**
- * POST /query — the ORCA AI pipeline. The backend runs a multi-agent LLM
- * chain (Ollama), so this can take several seconds; we allow a generous
- * timeout and surface AbortError to the caller for a clean "timed out" state.
- *
- * Contract is unchanged: request body is exactly { message }.
+ * POST /query — streams the ORCA AI pipeline's answer token by token via SSE.
+ * onToken(text) fires per chunk; onDone(payload) fires once with the final
+ * { text, map_data, reasoning_trail, safety_status }.
  */
-export async function sendQuery(message, { timeoutMs = 45000 } = {}) {
+export async function sendQuery(message, { onToken, onDone, timeoutMs = 60000, signal } = {}) {
   const ctrl = new AbortController()
-  const timer = setTimeout(() => ctrl.abort(), timeoutMs)
+  let timer = setTimeout(() => ctrl.abort(), timeoutMs)
+  const resetTimer = () => {
+    clearTimeout(timer)
+    timer = setTimeout(() => ctrl.abort(), timeoutMs)
+  }
+  if (signal) signal.addEventListener('abort', () => ctrl.abort())
+
+  let fullText = ''
+  let finalPayload = null
+
   try {
     const res = await fetch(`${API_BASE}/query`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
       body: JSON.stringify({ message }),
       signal: ctrl.signal,
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    return await res.json()
+    if (!res.body) throw new Error('No response body (streaming not supported)')
+
+    const reader = res.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      resetTimer()
+      buffer += decoder.decode(value, { stream: true })
+
+      const frames = buffer.split('\n\n')
+      buffer = frames.pop()
+
+      for (const frame of frames) {
+        const line = frame.trim()
+        if (!line.startsWith('data:')) continue
+        const payload = line.slice(5).trim()
+        if (payload === '[DONE]') continue
+
+        const event = JSON.parse(payload)
+        if (event.type === 'token') {
+          fullText += event.text
+          onToken?.(event.text, fullText)
+        } else if (event.type === 'done') {
+          finalPayload = event
+          onDone?.(event)
+        }
+      }
+    }
+    return finalPayload ?? { text: fullText }
   } finally {
     clearTimeout(timer)
   }
