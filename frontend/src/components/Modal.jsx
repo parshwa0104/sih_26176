@@ -30,7 +30,7 @@ export default function Modal({ title, onClose, closeLabel = 'Close', children }
             type="button"
             onClick={onClose}
             aria-label={closeLabel}
-            className="grid h-8 w-8 place-items-center rounded-lg text-ink-dim hover:bg-white/5"
+            className="grid h-8 w-8 place-items-center rounded-lg text-ink-dim hover:bg-black/5"
           >
             <X size={16} />
           </button>

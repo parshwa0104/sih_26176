@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet'
 import { Plus, Minus, LocateFixed } from 'lucide-react'
 import PfzLayer from './PfzLayer'
@@ -6,6 +6,7 @@ import SeaStateLayer from './SeaStateLayer'
 import QueryOverlay from './QueryOverlay'
 import { vesselIcon } from '../lib/mapIcons'
 import { isNum, cx } from '../lib/format'
+import debounce from 'lodash.debounce'
 
 const validCenter = (c) => Array.isArray(c) && isNum(c[0]) && isNum(c[1])
 
@@ -18,12 +19,22 @@ function MapController({ center, zoom, onMove }) {
     }
   }, [center, zoom, map])
 
+  const handleMove = useMemo(
+    () =>
+      debounce(() => {
+        const c = map.getCenter()
+        onMove?.(c.lat, c.lng)
+      }, 200),
+    [map, onMove]
+  )
+
   useMapEvents({
-    move() {
-      const c = map.getCenter()
-      onMove?.(c.lat, c.lng)
-    },
+    move: handleMove,
   })
+
+  useEffect(() => {
+    return () => handleMove.cancel()
+  }, [handleMove])
 
   return null
 }
@@ -45,12 +56,13 @@ export default function OceanMap({
   const [map, setMap] = useState(null)
 
   const ctrlBtn =
-    'grid h-9 w-9 place-items-center text-ink-dim transition-colors hover:bg-white/5 hover:text-ink disabled:opacity-30'
+    'grid h-9 w-9 place-items-center text-ink-dim transition-colors hover:bg-black/5 hover:text-ink disabled:opacity-30'
 
   return (
     <div className="absolute inset-0">
       <MapContainer
         ref={setMap}
+        preferCanvas={true}
         center={validCenter(center) ? center : [15, 76]}
         zoom={isNum(zoom) ? zoom : 6}
         zoomControl={false}
@@ -79,17 +91,7 @@ export default function OceanMap({
         <QueryOverlay data={queryMapData} t={t} />
       </MapContainer>
 
-      {/* Depth vignette + cool ocean wash — keeps the console feel, never blocks
-          interaction (sits outside the filtered tile pane). */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          boxShadow: 'inset 0 0 170px 50px rgba(3,21,37,0.78)',
-          background:
-            'radial-gradient(130% 85% at 50% 0%, rgba(9,32,54,0.10) 40%, rgba(3,21,37,0.42)), linear-gradient(180deg, rgba(11,41,68,0.28), rgba(6,29,50,0.34))',
-        }}
-      />
+
 
       {/* Map controls */}
       <div className="absolute right-3 top-3 z-[500] flex flex-col overflow-hidden rounded-xl border border-hairline bg-ocean-850/90 backdrop-blur">

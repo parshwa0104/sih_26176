@@ -75,7 +75,7 @@ export default function ZoneDetails({ zone, onAsk, onCenter, t }) {
         <button
           type="button"
           onClick={() => onAsk?.(`Tell me about fishing near ${zone.description || zone.label}`)}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-white/5"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-black/5"
         >
           <Compass size={13} />
           {t.askAboutThis}

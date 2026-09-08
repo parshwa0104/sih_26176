@@ -45,7 +45,7 @@ export default function Sidebar({ activeNav, onNav, systemStatus = 'connecting',
                   'group relative grid h-12 w-12 place-items-center rounded-xl border transition-colors',
                   active
                     ? 'border-hairline-strong bg-accent/10 text-accent'
-                    : 'border-transparent text-ink-dim hover:bg-white/5 hover:text-ink',
+                    : 'border-transparent text-ink-dim hover:bg-black/5 hover:text-ink',
                 )}
               >
                 <Icon size={20} strokeWidth={1.75} />

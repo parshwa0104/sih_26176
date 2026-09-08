@@ -26,7 +26,7 @@ const CONF = {
     wordKey: 'safetyUnknown',
     color: '#9DB8D0',
     Icon: HelpCircle,
-    grad: 'from-white/5',
+    grad: 'from-black/5',
   },
 }
 

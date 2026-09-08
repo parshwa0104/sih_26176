@@ -118,7 +118,7 @@ export default function OrcaResponse({
           <button
             type="button"
             onClick={onRetry}
-            className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1 text-xs font-semibold text-accent transition-colors hover:bg-white/5"
+            className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1 text-xs font-semibold text-accent transition-colors hover:bg-black/5"
           >
             <RefreshCw size={12} />
             {t.retry}

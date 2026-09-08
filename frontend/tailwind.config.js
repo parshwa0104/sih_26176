@@ -7,21 +7,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Deep ocean grounds
-        ocean: { 900: '#031525', 850: '#061D32', 800: '#082641' },
-        // Instrument surfaces
-        surface: { 1: '#0A2944', 2: '#0D3352', 3: '#103D60' },
-        // Bioluminescent instrumentation accent
-        accent: { DEFAULT: '#22B8FF', bright: '#36CFFF', deep: '#0EA5E9' },
-        // Secondary marine accent
-        marine: { DEFAULT: '#2DD4BF', deep: '#14B8A6' },
-        // Status
-        status: { safe: '#2EE6A6', caution: '#F5B942', danger: '#FF5C5C' },
-        // Text
-        ink: { DEFAULT: '#F4FAFF', dim: '#9DB8D0' },
-        // Hairline borders
-        hairline: 'rgba(54, 207, 255, 0.20)',
-        'hairline-strong': 'rgba(54, 207, 255, 0.35)',
+        // High contrast light theme
+        ocean: { 900: '#F0F4F8', 850: '#FFFFFF', 800: '#E2E8F0' },
+        surface: { 1: '#FFFFFF', 2: '#F8FAFC', 3: '#F1F5F9' },
+        accent: { DEFAULT: '#0369A1', bright: '#0284C7', deep: '#0C4A6E' },
+        marine: { DEFAULT: '#0F766E', deep: '#115E59' },
+        status: { safe: '#15803D', caution: '#B45309', danger: '#B91C1C' },
+        ink: { DEFAULT: '#0F172A', dim: '#475569' },
+        hairline: 'rgba(0, 0, 0, 0.15)',
+        'hairline-strong': 'rgba(0, 0, 0, 0.25)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
@@ -29,11 +23,11 @@ export default {
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       borderColor: {
-        DEFAULT: 'rgba(54, 207, 255, 0.20)',
+        DEFAULT: 'rgba(0, 0, 0, 0.10)',
       },
       boxShadow: {
-        inst: '0 18px 50px -12px rgba(0, 0, 0, 0.7)',
-        glow: '0 0 20px rgba(54, 207, 255, 0.35)',
+        inst: '0 18px 50px -12px rgba(0, 0, 0, 0.15)',
+        glow: '0 0 20px rgba(3, 105, 161, 0.35)',
       },
       keyframes: {
         'orca-ping': {

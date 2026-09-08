@@ -11,7 +11,8 @@ const AskOrca = forwardRef(function AskOrca({ onSubmit, loading, lang, t, classN
 
   const { supported, listening, toggle } = useSpeech(LANG_SPEECH[lang] || 'en-IN', (transcript) => {
     setValue(transcript)
-    onSubmit?.(transcript)
+    // Note: we intentionally do NOT auto-submit here.
+    // The transcript fills the input so the user can review and press Send.
   })
 
   const submit = (e) => {
@@ -66,7 +67,7 @@ const AskOrca = forwardRef(function AskOrca({ onSubmit, loading, lang, t, classN
               'grid h-10 w-10 shrink-0 place-items-center rounded-xl border transition-colors',
               listening
                 ? 'border-status-danger/50 bg-status-danger/15 text-status-danger animate-pulse'
-                : 'border-hairline text-ink-dim hover:bg-white/5 hover:text-ink',
+                : 'border-hairline text-ink-dim hover:bg-black/5 hover:text-ink',
             )}
           >
             {listening ? <Square size={16} /> : <Mic size={18} />}
