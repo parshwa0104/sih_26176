@@ -6,5 +6,5 @@ python-dotenv
 langchain
 langchain-core
 langgraph
-langchain-ollama
+langchain-groq
 streamlit
