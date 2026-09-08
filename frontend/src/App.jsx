@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { WifiOff, RefreshCw } from 'lucide-react'
 
 import { UI_STRINGS, LANG_CODES, LANG_FULL } from './translations'
-import { getConditions, getPfzZones, getSeaState, sendQuery } from './api/client'
+import { getConditions, getPfzZones, getSeaState, sendQuery, API_BASE } from './api/client'
 import { deriveInsights } from './lib/insights'
 import { isNum } from './lib/format'
 import { useMediaQuery } from './hooks/useMediaQuery'
@@ -136,6 +136,14 @@ export default function App() {
       alive = false
     }
   }, [applyResults])
+
+  // Keep-alive ticker for Render free tier (pings every 5 mins while app is open)
+  useEffect(() => {
+    const ticker = setInterval(() => {
+      fetch(`${API_BASE}/`).catch(() => {})
+    }, 5 * 60 * 1000)
+    return () => clearInterval(ticker)
+  }, [])
 
   const handleMove = useCallback((lat, lng) => setReadout([lat, lng]), [])
 
