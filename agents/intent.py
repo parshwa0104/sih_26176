@@ -2,7 +2,7 @@ import json
 from langchain_core.prompts import PromptTemplate
 from langchain_groq import ChatGroq
 
-llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0)
+llm = ChatGroq(model="llama-3.1-70b-versatile", temperature=0)
 # based on user intent, language we are going to decide which script to use from our data directory
 intent_prompt = PromptTemplate.from_template(
     """You are an intent classification agent for a marine intelligence system called ORCA.

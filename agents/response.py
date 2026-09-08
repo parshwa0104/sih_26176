@@ -1,7 +1,7 @@
 from langchain_core.prompts import PromptTemplate
 from langchain_groq import ChatGroq
 
-llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0.3)
+llm = ChatGroq(model="llama-3.1-70b-versatile", temperature=0.3)
 
 response_prompt = PromptTemplate.from_template(
     """You are ORCA, a marine intelligence AI. You are explaining the results of a data query to a fisherman.
