@@ -37,6 +37,7 @@ def process_query_stream(query: str):
     if not location:
         location = home_port
         location_note = f" (defaulting to home port: {home_port})"
+        reasoning_trail[-1]["result"] += location_note
 
     # ── Step 2: Data Fetching ──
     pfz_data = {}

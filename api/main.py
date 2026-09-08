@@ -56,7 +56,7 @@ def process_query_endpoint(request: QueryRequest):
             "text": "ORCA encountered an error processing your request. Please try again.",
             "error": True,
             "map_data": None,
-            "reasoning_trail": [{"agent": "Orchestrator", "action": "Processing query", "status": "error", "result": str(e)}],
+            "reasoning_trail": [{"agent": "Orchestrator", "action": "Processing query", "status": "error", "result": "Pipeline error"}],
         }
 
 @app.get("/conditions")
