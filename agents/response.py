@@ -1,4 +1,3 @@
-import json
 from langchain_core.prompts import PromptTemplate
 from langchain_ollama import ChatOllama
 
@@ -22,40 +21,46 @@ Route Data: {route_data}
 INSTRUCTIONS:
 1. Write a short (2-4 sentences), clear answer based on the Data Context above.
 2. If the Target Language is not English, translate the answer to that language.
-3. Output ONLY a valid JSON object (no markdown, no backticks):
-{{
-    "text": "Your translated answer here"
-}}
+3. Output ONLY the plain answer text. Do NOT use JSON, markdown, or backticks.
 
-Output JSON:"""
+Answer:"""
 )
 
 
-def generate_response(query: str, language: str,pfz_data: dict, weather_data: dict, safety_data: dict,
-                      geofence_data: dict = None, historical_data: dict = None,route_data: dict = None) -> dict:
-    """Generate the final natural-language response and determine map_data."""
-    chain = response_prompt | llm
-
-    # Determine map_data based on what data is available (priority order)
-    map_data = None
+def get_map_data(pfz_data, safety_data, geofence_data, route_data, weather_data=None):
+    """Determine map_data based on what data is available (priority order)."""
     if route_data and route_data.get("waypoints"):
-        map_data = route_data
-    elif pfz_data and pfz_data.get("lat"):
-        map_data = pfz_data
-    elif safety_data and safety_data.get("lat"):
-        map_data = safety_data
-    elif geofence_data and geofence_data.get("nearest_zone"):
+        return route_data
+    if pfz_data and pfz_data.get("lat"):
+        return pfz_data
+    if safety_data and safety_data.get("lat"):
+        return safety_data
+    if geofence_data and geofence_data.get("nearest_zone"):
         zone = geofence_data["nearest_zone"]
-        map_data = {
+        return {
             "type": "geofence",
             "lat": zone["center"][0],
             "lng": zone["center"][1],
             "bounds": zone["bounds"],
             "name": zone["name"],
-            "color": "red"
+            "color": "red",
         }
+    if weather_data and weather_data.get("lat"):
+        return {
+            "type": "weather",
+            "lat": weather_data["lat"],
+            "lng": weather_data["lng"],
+        }
+    return None
 
-    response = chain.invoke({
+
+def generate_response_stream(query: str, language: str, pfz_data: dict, weather_data: dict,
+                              safety_data: dict, geofence_data: dict = None,
+                              historical_data: dict = None, route_data: dict = None):
+    """Stream the final natural-language response token by token."""
+    chain = response_prompt | llm
+
+    for chunk in chain.stream({
         "query": query,
         "language": language,
         "pfz_data": pfz_data or "None",
@@ -64,27 +69,6 @@ def generate_response(query: str, language: str,pfz_data: dict, weather_data: di
         "geofence_data": geofence_data or "None",
         "historical_data": historical_data or "None",
         "route_data": route_data or "None",
-    })
-
-    try:
-        text = response.content
-        if "```json" in text:
-            text = text.split("```json")[1].split("```")[0].strip()
-        elif "```" in text:
-            text = text.split("```")[1].split("```")[0].strip()
-
-        data = json.loads(text)
-        # Force inject map_data (don't trust LLM to format coordinates)
-        data["map_data"] = map_data
-        return data
-    except Exception as e:
-        print("Response parsing failed:", e, response.content)
-        # Fallback: use raw LLM text
-        raw_text = response.content.strip()
-        # Try to clean if it looks like a broken JSON
-        if raw_text.startswith("{"):
-            raw_text = "I found some information for you. Please check the map."
-        return {
-            "text": raw_text,
-            "map_data": map_data
-        }
+    }):
+        if chunk.content:
+            yield chunk.content

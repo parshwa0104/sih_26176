@@ -1,0 +1,108 @@
+.agent-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 4;
+  width: 108px;
+}
+
+.agent-node-ring {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border);
+  background: rgba(9, 26, 44, 0.8);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.agent-node-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-faint);
+  transition: color 0.3s ease;
+}
+
+.tone-cyan .agent-node-icon { color: var(--cyan-soft); }
+.tone-teal .agent-node-icon { color: #4fd8c9; }
+.tone-success .agent-node-icon { color: var(--success); }
+.tone-blue .agent-node-icon { color: #7cabfb; }
+
+.status-idle .agent-node-ring {
+  opacity: 0.55;
+}
+
+.status-analysing .agent-node-ring {
+  border-color: currentColor;
+  animation: nodePulse 1.4s ease-in-out infinite;
+}
+
+.tone-cyan.status-analysing .agent-node-ring { color: var(--cyan-soft); box-shadow: 0 0 16px rgba(45, 212, 245, 0.4); }
+.tone-teal.status-analysing .agent-node-ring { color: #4fd8c9; box-shadow: 0 0 16px rgba(20, 184, 166, 0.4); }
+.tone-success.status-analysing .agent-node-ring { color: var(--success); box-shadow: 0 0 16px rgba(43, 208, 138, 0.4); }
+.tone-blue.status-analysing .agent-node-ring { color: #7cabfb; box-shadow: 0 0 16px rgba(59, 130, 246, 0.4); }
+
+.status-complete .agent-node-ring {
+  background: rgba(43, 208, 138, 0.12);
+  border-color: rgba(43, 208, 138, 0.55);
+}
+
+@keyframes nodePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.agent-node-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.agent-node-name {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.agent-node-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--ink-faint);
+  margin-top: 2px;
+}
+
+.status-analysing .agent-node-status { color: var(--cyan-soft); }
+.status-complete .agent-node-status { color: var(--success); }
+
+.agent-node-finding {
+  position: absolute;
+  top: 100%;
+  margin-top: 10px;
+  width: 190px;
+  padding: 9px 11px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  animation: findingReveal 0.4s ease both;
+  z-index: 6;
+}
+
+.agent-node-finding.side-left { left: 0; }
+.agent-node-finding.side-right { right: 0; }
+
+@keyframes findingReveal {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

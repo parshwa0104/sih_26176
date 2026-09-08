@@ -1,0 +1,100 @@
+.investigation-view {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  animation: viewFadeIn 0.5s ease both;
+}
+
+@keyframes viewFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.investigation-query {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px auto 0;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(9, 26, 44, 0.85);
+  border: 1px solid var(--border-strong);
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 500;
+  max-width: 80%;
+  backdrop-filter: blur(8px);
+}
+
+.investigation-query svg {
+  color: var(--cyan-soft);
+  flex-shrink: 0;
+}
+
+.investigation-canvas {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+.investigation-canvas.dimmed {
+  opacity: 0.25;
+  filter: blur(1px);
+}
+
+
+.iv-run {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 9px auto 0;
+  max-width: 92%;
+  min-height: 24px;
+  animation: viewFadeIn 0.4s ease both;
+}
+.iv-converge-chip {
+  flex-shrink: 0;
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(43, 208, 138, 0.35);
+  background: rgba(43, 208, 138, 0.1);
+  color: #7df0c2;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  animation: chipIn 0.4s var(--ease-out) both;
+}
+@keyframes chipIn { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+.iv-runline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 18px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 10px, #000 calc(100% - 18px), transparent);
+}
+.iv-runline-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ink-faint);
+  animation: viewFadeIn 0.35s ease both;
+}
+.iv-runline-label { color: var(--ink-soft); }
+.iv-runline-item::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--cyan-soft);
+  opacity: 0.65;
+  flex-shrink: 0;
+}
+.iv-runline-item time { color: var(--ink-faint); }

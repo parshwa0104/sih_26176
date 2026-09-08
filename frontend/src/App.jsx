@@ -1,422 +1,588 @@
-import { useState, useEffect } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, Circle, Polygon, Polyline, Rectangle, useMap } from 'react-leaflet'
-import L from 'leaflet'
-import { Mic, ShieldAlert, CheckCircle, AlertTriangle, Send, Loader2, ChevronDown, ChevronUp, Info, Bell, X, Globe } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { WifiOff, RefreshCw } from 'lucide-react'
 
-import { UI_STRINGS } from './translations'
+import { UI_STRINGS, LANG_CODES, LANG_FULL } from './translations'
+import { getConditions, getPfzZones, getSeaState, sendQuery } from './api/client'
+import { deriveInsights } from './lib/insights'
+import { isNum } from './lib/format'
+import { useMediaQuery } from './hooks/useMediaQuery'
+import { useReducedMotion } from './hooks/useReducedMotion'
 
+import Sidebar from './components/Sidebar'
+import MobileNav from './components/MobileNav'
+import Header from './components/Header'
+import SafetyBanner from './components/SafetyBanner'
+import ConditionsStrip from './components/ConditionsStrip'
+import OceanMap from './components/OceanMap'
+import AskOrca from './components/AskOrca'
+import OrcaResponse from './components/OrcaResponse'
+import AIInsights from './components/AIInsights'
+import AlertsPanel from './components/AlertsPanel'
+import ZoneDetails from './components/ZoneDetails'
+import BottomSheet from './components/BottomSheet'
+import ReportPanel from './components/ReportPanel'
+import SettingsPanel from './components/SettingsPanel'
+import Login from './components/Login'
+import { useAuth } from './contexts/AuthContext'
+import InvestigationView from './components/visualizer/InvestigationView'
+import { useInvestigation } from './components/visualizer/useInvestigation'
 
-/* ── Vessel icon ── */
-const vesselIcon = L.divIcon({
-  className: '',
-  html: `<div style="width:18px;height:18px;background:#2563eb;border:3px solid white;border-radius:50%;box-shadow:0 0 8px rgba(37,99,235,0.6)"></div>`,
-  iconSize: [18, 18], iconAnchor: [9, 9],
-})
+const DEFAULT_CENTER = [15, 76] // Arabian Sea overview
+const LANG_KEY = 'orca.lang'
 
-/* ── Map controller ── */
-function MapCtrl({ center, zoom }) {
-  const map = useMap()
-  useEffect(() => { if (center) map.setView(center, zoom || 9, { animate: true }) }, [center, zoom, map])
+/** Centre point for a map_data overlay, guarding every optional field. */
+function overlayCenter(md) {
+  if (!md || typeof md !== 'object') return null
+  if (Array.isArray(md.waypoints)) {
+    const wps = md.waypoints.filter((p) => p && isNum(p.lat) && isNum(p.lng))
+    if (wps.length) {
+      const mid = wps[Math.floor(wps.length / 2)] // keep the line clear of the drawer
+      return [mid.lat, mid.lng]
+    }
+  }
+  if (isNum(md.lat) && isNum(md.lng)) return [md.lat, md.lng]
+  if (Array.isArray(md.bounds)) {
+    const pts = md.bounds.filter((p) => Array.isArray(p) && isNum(p[0]) && isNum(p[1]))
+    if (pts.length) {
+      const lat = pts.reduce((s, p) => s + p[0], 0) / pts.length
+      const lng = pts.reduce((s, p) => s + p[1], 0) / pts.length
+      return [lat, lng]
+    }
+  }
   return null
 }
 
-/* ══════════════════════════════════════ */
-function App() {
-  const [query, setQuery] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [mapCenter, setMapCenter] = useState([9.93, 76.27])
-  const [mapZoom, setMapZoom] = useState(9)
+export default function App() {
+  /* ── Language ── */
+  const [lang, setLang] = useState(() => {
+    try {
+      const saved = localStorage.getItem(LANG_KEY)
+      if (saved && LANG_CODES.includes(saved)) return saved
+    } catch {
+      /* ignore */
+    }
+    return 'EN'
+  })
+  const t = useMemo(() => ({ ...UI_STRINGS.EN, ...(UI_STRINGS[lang] || {}) }), [lang])
+  const changeLang = useCallback((code) => {
+    setLang(code)
+    try {
+      localStorage.setItem(LANG_KEY, code)
+    } catch {
+      /* ignore */
+    }
+  }, [])
 
-  // Data from backend
+  /* ── Environment ── */
+  const isMobile = useMediaQuery('(max-width: 1023px)')
+  const reducedMotion = useReducedMotion()
+
+  /* ── Auth ── */
+  const { currentUser } = useAuth()
+
+  /* ── Dashboard data ── */
   const [conditions, setConditions] = useState(null)
   const [pfzZones, setPfzZones] = useState([])
   const [seaState, setSeaState] = useState([])
-  const [userLoc, setUserLoc] = useState(null)
-  const [locationLabel, setLocationLabel] = useState('Kochi Port')
-  const [alerts, setAlerts] = useState([])
-  const [safetyStatus, setSafetyStatus] = useState('safe')
+  const [dashLoading, setDashLoading] = useState(true)
+  const [systemStatus, setSystemStatus] = useState('connecting') // connecting | live | offline
 
-  // Currently active data strip (updates on zone tap or query)
-  const [activeConditions, setActiveConditions] = useState(null)
-  const [activeSource, setActiveSource] = useState('')
-  const [activeUpdated, setActiveUpdated] = useState('')
+  /* ── Map view ── */
+  const [center, setCenter] = useState(DEFAULT_CENTER)
+  const [zoom, setZoom] = useState(6)
+  const [readout, setReadout] = useState(DEFAULT_CENTER)
+  const [showPfz, setShowPfz] = useState(true)
+  const [showSeaState, setShowSeaState] = useState(true)
+  const didInitCenter = useRef(false)
 
-  // Query response
-  const [responseData, setResponseData] = useState(null)
-  const [sheetOpen, setSheetOpen] = useState(false)
-  const [queryMapData, setQueryMapData] = useState(null)
-
-  // Selected PFZ zone (from tapping a marker)
-  const [selectedZone, setSelectedZone] = useState(null)
-
-  // UI toggles
-  const [showAlerts, setShowAlerts] = useState(false)
-  const [lang, setLang] = useState('EN')
-  const [showLangMenu, setShowLangMenu] = useState(false)
-  const languages = ['EN', 'हि', 'मरा', 'த', 'മ', 'తె', 'বা']
-
-  // Current dictionary
-  const t = UI_STRINGS[lang] || UI_STRINGS['EN']
-
-  /* ── Load initial data ── */
-  useEffect(() => {
-    fetch('http://localhost:8000/conditions')
-      .then(r => r.json())
-      .then(d => {
-        setConditions(d)
-        setActiveConditions({ sst: d.sst, wind_speed: d.wind_speed, wave_height: d.wave_height, chlorophyll: d.chlorophyll })
-        setActiveSource(d.source || 'INCOIS')
-        setActiveUpdated(d.updated || '')
-        setLocationLabel(d.location || 'Kochi Port')
-        setSafetyStatus(d.safety || 'safe')
-        setAlerts(d.alerts || [])
-        if (d.user_location) {
-          setUserLoc(d.user_location)
-          setMapCenter([d.user_location.lat, d.user_location.lng])
-        }
-      }).catch(() => {})
-
-    fetch('http://localhost:8000/pfz-zones')
-      .then(r => r.json())
-      .then(d => setPfzZones(d.zones || []))
-      .catch(() => {})
-
-    fetch('http://localhost:8000/sea-state')
-      .then(r => r.json())
-      .then(d => setSeaState(d.grid || []))
-      .catch(() => {})
+  // Apply the results of the three dashboard GETs. Also recentre the chart on
+  // the vessel once, the first time /conditions arrives.
+  const applyResults = useCallback(([c, p, s]) => {
+    let ok = false
+    if (c.status === 'fulfilled') {
+      setConditions(c.value)
+      ok = true
+      const u = c.value?.user_location
+      if (!didInitCenter.current && u && isNum(u.lat) && isNum(u.lng)) {
+        didInitCenter.current = true
+        setCenter([u.lat, u.lng])
+        setZoom(9)
+      }
+    }
+    if (p.status === 'fulfilled') {
+      setPfzZones(Array.isArray(p.value?.zones) ? p.value.zones : [])
+      ok = true
+    }
+    if (s.status === 'fulfilled') {
+      setSeaState(Array.isArray(s.value?.grid) ? s.value.grid : [])
+      ok = true
+    }
+    setSystemStatus(ok ? 'live' : 'offline')
+    setDashLoading(false)
   }, [])
 
-  /* ── Zone tap handler ── */
-  const handleZoneTap = (zone) => {
-    setSelectedZone(zone)
-    setSheetOpen(true)
-    setResponseData(null)
+  const loadData = useCallback(async () => {
+    setDashLoading(true)
+    setSystemStatus('connecting')
+    applyResults(await Promise.allSettled([getConditions(), getPfzZones(), getSeaState()]))
+  }, [applyResults])
 
-    if (zone.conditions) {
-      setActiveConditions({
-        sst: zone.conditions.sst,
-        wind_speed: zone.conditions.wind_speed,
-        wave_height: zone.conditions.wave_height,
-        chlorophyll: zone.conditions.chlorophyll,
-      })
-      setLocationLabel(zone.description || zone.label)
-      setActiveSource(zone.source || 'INCOIS')
-      setActiveUpdated(zone.updated || '')
+  useEffect(() => {
+    let alive = true
+    Promise.allSettled([getConditions(), getPfzZones(), getSeaState()]).then((res) => {
+      if (alive) applyResults(res)
+    })
+    return () => {
+      alive = false
     }
-  }
+  }, [applyResults])
 
-  /* ── Query handler ── */
-  const handleSearch = async (overrideQuery) => {
-    const q = overrideQuery || query
-    if (!q.trim()) return
-    setIsLoading(true)
-    setSheetOpen(true)
-    setSelectedZone(null)
-    setResponseData(null)
-    setQueryMapData(null)
-    
-    // Convert short language code to full name for backend
-    const langMap = {'EN': 'english', 'हि': 'hindi', 'मरा': 'marathi', 'த': 'tamil', 'മ': 'malayalam', 'తె': 'telugu', 'বা': 'bengali'}
-    const fullLangName = langMap[lang] || 'english'
+  const handleMove = useCallback((lat, lng) => setReadout([lat, lng]), [])
 
-    try {
-      const res = await fetch('http://localhost:8000/query', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        // Append language instruction so backend responds in chosen language
-        body: JSON.stringify({ message: q + ` (reply in ${fullLangName})` })
-      })
-      const data = await res.json()
-      setResponseData(data)
+  /* ── Query / interaction state ── */
+  const [qLoading, setQLoading] = useState(false)
+  const [qError, setQError] = useState(null) // 'timeout' | 'failed' | null
+  const [response, setResponse] = useState(null)
+  const [queryMapData, setQueryMapData] = useState(null)
+  const [selectedZone, setSelectedZone] = useState(null)
+  const investigation = useInvestigation()
 
-      if (data.map_data) {
-        setQueryMapData(data.map_data)
-        if (data.map_data.lat && data.map_data.lng) {
-          setMapCenter([data.map_data.lat, data.map_data.lng])
-          setMapZoom(10)
-        } else if (data.map_data.waypoints?.[0]) {
-          setMapCenter([data.map_data.waypoints[0].lat, data.map_data.waypoints[0].lng])
-          setMapZoom(9)
+  /* ── UI shell state ── */
+  const [activeNav, setActiveNav] = useState('home')
+  const [mobileSheet, setMobileSheet] = useState(null) // response | zone | conditions | insights | alerts
+  const [modal, setModal] = useState(null) // reports | settings
+  const askInputRef = useRef(null)
+
+  /* ── Derived ── */
+  const alerts = conditions?.alerts || []
+  const userLoc = conditions?.user_location || null
+
+  const safetyStatus = useMemo(() => {
+    if (response?.safety_status) return response.safety_status
+    if (response?.map_data?.status) return response.map_data.status
+    if (selectedZone?.conditions?.safety) return selectedZone.conditions.safety
+    if (conditions?.safety) return conditions.safety
+    return dashLoading ? 'unknown' : 'safe'
+  }, [response, selectedZone, conditions, dashLoading])
+
+  const locationLabel = selectedZone?.description || conditions?.location || null
+
+  const activeConditions = useMemo(() => {
+    if (selectedZone?.conditions) return selectedZone.conditions
+    if (!conditions) return null
+    return {
+      sst: conditions.sst,
+      wind_speed: conditions.wind_speed,
+      wave_height: conditions.wave_height,
+      chlorophyll: conditions.chlorophyll,
+    }
+  }, [selectedZone, conditions])
+  const activeSource = selectedZone?.source || conditions?.source || ''
+  const activeUpdated = selectedZone?.updated || conditions?.updated || ''
+
+  const insights = useMemo(
+    () => deriveInsights({ conditions, pfzZones, safetyStatus, t }),
+    [conditions, pfzZones, safetyStatus, t],
+  )
+
+  /* ── Handlers ── */
+  const runQuery = useCallback(
+    async (raw) => {
+      const q = String(raw ?? '').trim()
+      if (!q) return
+      setSelectedZone(null)
+      setQError(null)
+      setResponse(null)
+      setQueryMapData(null)
+      setQLoading(true)
+      setActiveNav('ask')
+      if (isMobile) setMobileSheet('response')
+      investigation.start(q)
+
+      const full = LANG_FULL[lang] || 'english'
+      try {
+        const data =await sendQuery(message, {
+  onToken: (token) => setAnswer((prev) => prev + token),
+  onDone: (final) => setMapData(final.map_data),
+})
+        setResponse(data)
+        const md = data?.map_data || null
+        setQueryMapData(md)
+        const c = overlayCenter(md)
+        if (c) {
+          setCenter(c)
+          setZoom(md?.type === 'route' ? 8 : 10)
         }
+      } catch (err) {
+        setQError(err?.name === 'AbortError' ? 'timeout' : 'failed')
+      } finally {
+        setQLoading(false)
       }
-      if (data.safety_status) setSafetyStatus(data.safety_status)
-      else if (data.map_data?.status) setSafetyStatus(data.map_data.status)
-    } catch (err) {
-      console.error(err)
-      setResponseData({ text: 'Network error. Cannot reach ORCA.', reasoning_trail: [] })
-    } finally {
-      setIsLoading(false)
-      if (!overrideQuery) setQuery('')
-    }
-  }
+    },
+    [isMobile, lang, investigation],
+  )
 
-  /* ── Banner ── */
-  const getBanner = () => {
-    switch (safetyStatus) {
-      case 'danger': return { bg: 'bg-red-600', text: 'text-white', icon: <ShieldAlert size={28} />, word: t.danger }
-      case 'caution': return { bg: 'bg-amber-400', text: 'text-black', icon: <AlertTriangle size={28} />, word: t.caution }
-      default: return { bg: 'bg-green-600', text: 'text-white', icon: <CheckCircle size={28} />, word: t.safe }
+  const lastQueryRef = useRef('')
+  const handleSubmit = useCallback(
+    (text) => {
+      lastQueryRef.current = text
+      runQuery(text)
+    },
+    [runQuery],
+  )
+  const retryQuery = useCallback(() => {
+    if (lastQueryRef.current) runQuery(lastQueryRef.current)
+  }, [runQuery])
+
+  const handleZoneTap = useCallback(
+    (zone) => {
+      setSelectedZone(zone)
+      setResponse(null)
+      setQError(null)
+      setQueryMapData(null)
+      if (isNum(zone?.lat) && isNum(zone?.lng)) {
+        setCenter([zone.lat, zone.lng])
+        setZoom(9)
+      }
+      if (isMobile) setMobileSheet('zone')
+    },
+    [isMobile],
+  )
+
+  const handleInsightAction = useCallback(
+    (action) => {
+      if (!action) return
+      if (action.type === 'map' && Array.isArray(action.center) && isNum(action.center[0]) && isNum(action.center[1])) {
+        setCenter(action.center)
+        setZoom(action.zoom || 9)
+        setActiveNav('map')
+        setMobileSheet(null)
+      } else if (action.type === 'ask' && action.query) {
+        handleSubmit(action.query)
+      }
+    },
+    [handleSubmit],
+  )
+
+  const handleCenter = useCallback((c, z) => {
+    if (Array.isArray(c) && isNum(c[0]) && isNum(c[1])) {
+      setCenter(c)
+      setZoom(z || 10)
+      setMobileSheet(null)
     }
+  }, [])
+
+  const handleNav = useCallback(
+    (id) => {
+      if (id === 'reports') {
+        setModal('reports')
+        setActiveNav('reports')
+        return
+      }
+      if (id === 'settings' || id === 'more') {
+        setModal('settings')
+        setActiveNav('settings')
+        return
+      }
+      setActiveNav(id)
+      if (id === 'alerts') {
+        setMobileSheet(isMobile ? 'alerts' : null)
+      } else if (id === 'ask') {
+        setMobileSheet(null)
+        setTimeout(() => askInputRef.current?.focus(), 0)
+      } else {
+        setMobileSheet(null)
+      }
+    },
+    [isMobile],
+  )
+
+  const closeModal = useCallback(() => {
+    setModal(null)
+    setActiveNav((a) => (a === 'reports' || a === 'settings' ? 'home' : a))
+  }, [])
+
+  const clearDrawer = useCallback(() => {
+    setResponse(null)
+    setSelectedZone(null)
+    setQError(null)
+    setQueryMapData(null)
+  }, [])
+
+  /* ── Drawer content (shared desktop drawer + mobile sheet) ── */
+  const drawerActive = qLoading || qError || response || selectedZone
+  const drawerContent =
+    qError || response ? (
+      <OrcaResponse
+        loading={false}
+        error={qError}
+        data={response}
+        activeConditions={activeConditions}
+        activeSource={activeSource}
+        activeUpdated={activeUpdated}
+        safetyStatus={response ? safetyStatus : null}
+        onRetry={retryQuery}
+        t={t}
+      />
+    ) : selectedZone ? (
+      <ZoneDetails zone={selectedZone} onAsk={handleSubmit} onCenter={handleCenter} t={t} />
+    ) : null
+
+  const sheetTitle =
+    mobileSheet === 'response'
+      ? t.orcaAnswer
+      : mobileSheet === 'zone'
+        ? t.legendPfz
+        : mobileSheet === 'conditions'
+          ? t.conditionsTitle
+          : mobileSheet === 'insights'
+            ? t.insightsTitle
+            : mobileSheet === 'alerts'
+              ? t.alertsTitle
+              : ''
+
+  const mapFocus = activeNav === 'map'
+
+  if (!currentUser) {
+    return <Login />
   }
-  const banner = getBanner()
-  const confOpacity = (c) => c === 'High' ? 0.5 : c === 'Medium' ? 0.3 : 0.15
 
   return (
-    <div className="h-screen w-full flex flex-col overflow-hidden bg-gray-50 relative font-sans">
+    <div className="orca-bg relative flex h-[100dvh] w-full overflow-hidden bg-ocean-900 font-sans text-ink">
+      <Sidebar
+        activeNav={activeNav}
+        onNav={handleNav}
+        systemStatus={systemStatus}
+        alertCount={alerts.length}
+        t={t}
+      />
 
-      {/* ════ SAFETY BANNER ════ */}
-      <div className={`w-full py-3 px-4 flex items-center justify-between ${banner.bg} ${banner.text} z-30 shadow-md`}>
-        <div className="flex items-center gap-3">
-          {banner.icon}
-          <div>
-            <h1 className="text-base md:text-lg font-extrabold tracking-wide uppercase leading-tight">
-              {banner.word} {t.near} {locationLabel}
-            </h1>
-            {conditions?.craft_advisory && (
-              <p className="text-xs opacity-80 font-medium">{conditions.craft_advisory}</p>
-            )}
-          </div>
-        </div>
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col">
+        <Header
+          t={t}
+          lang={lang}
+          onLang={changeLang}
+          alertCount={alerts.length}
+          onBell={() => handleNav('alerts')}
+          onSearch={(v) => handleSubmit(`Ocean conditions and safety near ${v}`)}
+          homePort={conditions?.location}
+          systemStatus={systemStatus}
+        />
 
-        <div className="flex items-center gap-2">
-          {/* Language Toggle */}
-          <div className="relative">
-            <button onClick={() => setShowLangMenu(!showLangMenu)}
-              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/20 text-sm font-bold hover:bg-white/30">
-              <Globe size={14} /> {lang} <ChevronDown size={12} />
+        <SafetyBanner
+          status={safetyStatus}
+          locationLabel={locationLabel}
+          advisory={conditions?.craft_advisory}
+          updated={conditions?.updated}
+          loading={dashLoading && !conditions}
+          t={t}
+        />
+
+        {systemStatus === 'offline' && (
+          <div
+            role="alert"
+            className="flex items-center gap-3 border-b border-status-danger/30 bg-status-danger/10 px-4 py-2 text-sm lg:px-6"
+          >
+            <WifiOff size={16} className="shrink-0 text-status-danger" />
+            <span className="font-semibold text-ink">{t.backendDown}</span>
+            <span className="hidden text-ink-dim sm:inline">— {t.backendDownMsg}</span>
+            <button
+              type="button"
+              onClick={loadData}
+              className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1 text-xs font-semibold text-accent transition-colors hover:bg-black/5"
+            >
+              <RefreshCw size={12} />
+              {t.retry}
             </button>
-            {showLangMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-200 py-1 z-50 min-w-[70px]">
-                {languages.map(l => (
-                  <button key={l} onClick={() => { setLang(l); setShowLangMenu(false) }}
-                    className={`w-full px-3 py-1.5 text-left text-sm font-bold hover:bg-gray-100 ${l === lang ? 'text-blue-600' : 'text-gray-700'}`}>{l}</button>
-                ))}
-              </div>
-            )}
           </div>
-          {/* Alert Bell */}
-          {alerts.length > 0 && (
-            <button onClick={() => setShowAlerts(!showAlerts)} className="relative p-1">
-              <Bell size={20} />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] font-bold flex items-center justify-center text-white">{alerts.length}</span>
-            </button>
-          )}
-        </div>
-      </div>
+        )}
 
-      {/* Alert dropdown */}
-      {showAlerts && (
-        <div className="absolute top-14 right-4 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 p-3 space-y-2">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-sm font-bold text-gray-700">{t.activeAlerts}</p>
-            <button onClick={() => setShowAlerts(false)}><X size={16} className="text-gray-400" /></button>
-          </div>
-          {alerts.map((a, i) => (
-            <div key={i} className="flex items-start gap-2 p-2 bg-gray-50 rounded-lg">
-              <span className={`mt-1 w-2.5 h-2.5 rounded-full flex-shrink-0 ${a.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'}`}></span>
-              <div>
-                <p className="text-sm font-semibold text-gray-800">{a.text}</p>
-                <p className="text-xs text-gray-400">{a.time}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* ════ CONDITIONS STRIP ════ */}
-      {activeConditions && (
-        <div className="w-full bg-white border-b border-gray-200 px-3 py-2 z-20">
-          <div className="flex items-center gap-2 overflow-x-auto">
-            {[
-              { label: t.sst, value: activeConditions.sst, color: 'text-orange-600' },
-              { label: t.wind, value: activeConditions.wind_speed, color: 'text-sky-600' },
-              { label: t.waves, value: activeConditions.wave_height, color: 'text-blue-600' },
-              { label: t.chla, value: activeConditions.chlorophyll, color: 'text-green-600' },
-            ].map((m, i) => (
-              <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg flex-shrink-0">
-                <span className={`text-xs font-bold ${m.color}`}>{m.label}</span>
-                <span className="font-extrabold text-gray-800 text-sm">{m.value}</span>
-              </div>
-            ))}
-          </div>
-          <p className="text-[11px] text-gray-400 mt-1 px-1">
-            {t.near.charAt(0).toUpperCase() + t.near.slice(1)} <strong className="text-gray-600">{locationLabel}</strong> · {t.asOf} {activeUpdated} · {activeSource}
-          </p>
-        </div>
-      )}
-
-      {/* ════ MAP ════ */}
-      <div className="flex-1 relative z-0">
-        <MapContainer center={mapCenter} zoom={mapZoom} scrollWheelZoom={true} className="w-full h-full" zoomControl={false}>
-          <TileLayer attribution='&copy; OSM' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <MapCtrl center={mapCenter} zoom={mapZoom} />
-
-          {/* Vessel marker */}
-          {userLoc && (
-            <Marker position={[userLoc.lat, userLoc.lng]} icon={vesselIcon}>
-              <Popup><strong>📍 {userLoc.label}</strong><br/>Your location</Popup>
-            </Marker>
-          )}
-
-          {/* Sea State Heatmap */}
-          {seaState.map((cell, i) => {
-            const color = cell.safety === 'danger' ? '#ef4444' : cell.safety === 'caution' ? '#f59e0b' : '#3b82f6';
-            return (
-              <Rectangle key={`sea-${i}`} bounds={cell.bounds}
-                pathOptions={{ fillColor: color, stroke: false, fillOpacity: 0.3 }}>
-                <Popup>
-                  <strong>{cell.label}</strong><br/>
-                  SST: {cell.sst}°C<br/>
-                  Waves: {cell.wave}m
-                </Popup>
-              </Rectangle>
-            )
-          })}
-
-          {/* PFZ zone overlays */}
-          {pfzZones.map((z, i) => (
-            <Circle key={`pfz-${i}`} center={[z.lat, z.lng]} radius={z.radius}
-              pathOptions={{ fillColor: '#22c55e', color: '#16a34a', fillOpacity: confOpacity(z.confidence), weight: 2 }}
-              eventHandlers={{ click: () => handleZoneTap(z) }}
+        <div id="main" className="flex min-h-0 flex-1">
+          {/* ── Map area ── */}
+          <main className="relative min-h-0 flex-1">
+            <OceanMap
+              center={center}
+              zoom={zoom}
+              userLoc={userLoc}
+              pfzZones={pfzZones}
+              seaState={seaState}
+              showPfz={showPfz}
+              showSeaState={showSeaState}
+              queryMapData={queryMapData}
+              onZoneTap={handleZoneTap}
+              onMove={handleMove}
+              t={t}
             />
-          ))}
 
-          {/* Query overlays */}
-          {queryMapData?.type === 'pfz' && queryMapData.lat && (
-            <Circle center={[queryMapData.lat, queryMapData.lng]}
-              pathOptions={{ fillColor: '#facc15', color: '#eab308', fillOpacity: 0.6, weight: 4 }}
-              radius={queryMapData.radius || 15000} />
-          )}
-          {queryMapData?.type === 'safety' && queryMapData.lat && (
-            <Circle center={[queryMapData.lat, queryMapData.lng]}
-              pathOptions={{
-                fillColor: queryMapData.status === 'danger' ? '#dc2626' : queryMapData.status === 'caution' ? '#f59e0b' : '#16a34a',
-                color: queryMapData.status === 'danger' ? '#dc2626' : queryMapData.status === 'caution' ? '#f59e0b' : '#16a34a',
-                fillOpacity: 0.5, weight: 4
-              }} radius={30000} />
-          )}
-          {queryMapData?.type === 'geofence' && queryMapData.bounds && (
-            <Polygon positions={queryMapData.bounds}
-              pathOptions={{ fillColor: '#dc2626', color: '#dc2626', fillOpacity: 0.3, weight: 3, dashArray: '10 5' }}>
-              <Popup><strong>⛔ {queryMapData.name}</strong></Popup>
-            </Polygon>
-          )}
-          {queryMapData?.type === 'route' && queryMapData.waypoints && (
-            <>
-              <Polyline positions={queryMapData.waypoints.map(wp => [wp.lat, wp.lng])}
-                pathOptions={{ color: '#2563eb', weight: 5, dashArray: '12 6' }} />
-              {queryMapData.waypoints.map((wp, i) => (
-                <Marker key={i} position={[wp.lat, wp.lng]}>
-                  <Popup><strong>{wp.label}</strong></Popup>
-                </Marker>
-              ))}
-            </>
-          )}
-        </MapContainer>
-
-        {/* ════ SEARCH BAR ════ */}
-        <div className="absolute top-4 left-4 right-4 z-[500] flex gap-2">
-          <div className="flex-1 flex items-center bg-white rounded-xl px-4 h-12 border border-gray-300 shadow-lg focus-within:border-blue-600">
-            <input type="text" value={query} onChange={e => setQuery(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSearch()}
-              placeholder={t.placeholder}
-              className="w-full bg-transparent border-none outline-none text-base text-gray-900 placeholder-gray-400 font-semibold" />
-            <button onClick={() => handleSearch()} className="p-1 text-blue-600 active:scale-90"><Send size={22} /></button>
-          </div>
-          <button onClick={() => {}} className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg active:bg-blue-700 active:scale-95 flex-shrink-0">
-            <Mic size={24} />
-          </button>
-        </div>
-
-        {/* ════ BOTTOM SHEET ════ */}
-        <div className={`absolute bottom-0 left-0 right-0 z-[500] transition-transform duration-300 ease-out ${sheetOpen ? 'translate-y-0' : 'translate-y-[calc(100%-48px)]'}`}>
-          <button onClick={() => setSheetOpen(!sheetOpen)}
-            className="w-full flex justify-center pt-2 pb-1 bg-white rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.12)] border-t border-gray-200">
-            <div className="w-10 h-1.5 bg-gray-300 rounded-full"></div>
-          </button>
-
-          <div className="bg-white px-5 pb-6 max-h-[55vh] overflow-y-auto">
-            {/* Loading */}
-            {isLoading && (
-              <div className="flex items-center gap-3 text-blue-600 py-4">
-                <Loader2 size={24} className="animate-spin" />
-                <span className="text-lg font-bold">{t.analyzing}</span>
+            {qLoading && (
+              <div className="absolute inset-0 z-[400] pointer-events-none">
+                <InvestigationView investigation={investigation} />
               </div>
             )}
 
-            {/* Zone evidence panel */}
-            {!isLoading && selectedZone && !responseData && (
-              <div className="py-3 space-y-3">
-                <div>
-                  <h3 className="text-lg font-extrabold text-gray-900">PFZ — {selectedZone.description}</h3>
-                  <p className="text-base font-semibold text-gray-700 mt-1">{t.likelyCatch}: <span className="text-green-700">{selectedZone.species}</span></p>
-                </div>
+            {/* Layer toggles */}
+            <div className="absolute left-3 top-3 z-[500] rounded-xl border border-hairline bg-ocean-850/90 p-1 backdrop-blur">
+              <LayerToggle
+                active={showPfz}
+                onClick={() => setShowPfz((v) => !v)}
+                dot="#2EE6A6"
+                label={t.layerPfz}
+              />
+              <LayerToggle
+                active={showSeaState}
+                onClick={() => setShowSeaState((v) => !v)}
+                dot="#22B8FF"
+                label={t.layerSea}
+              />
+            </div>
 
-                {selectedZone.conditions && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 space-y-1">
-                    <p className="text-sm font-bold text-gray-700">
-                      {t.why}: <span className="font-normal">{t.sst} {selectedZone.conditions.sst} ({selectedZone.conditions.sst_range}) · {t.chla} {selectedZone.conditions.chlorophyll}</span>
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {t.conditions}: {t.wind} {selectedZone.conditions.wind_speed}, {t.waves} {selectedZone.conditions.wave_height} — <span className="font-semibold text-green-700">{selectedZone.conditions.craft_advisory}</span>
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">{selectedZone.source}, {t.asOf} {selectedZone.updated}</p>
+            {/* Coordinate readout */}
+            <div className="absolute bottom-3 right-3 z-[500] hidden rounded-lg border border-hairline bg-ocean-850/90 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-ink-dim backdrop-blur sm:block">
+              <div className="text-ink">{fmtReadout(readout)}</div>
+            </div>
+
+            {/* Command console + response drawer */}
+            <div className="absolute inset-x-2 bottom-[74px] z-[600] flex flex-col gap-2 sm:inset-x-3 lg:inset-x-auto lg:bottom-6 lg:left-6 lg:w-[min(640px,52vw)]">
+              {drawerActive && !qLoading && drawerContent && (
+                <div className="hidden max-h-[46vh] animate-fade-up overflow-y-auto rounded-2xl border border-hairline-strong bg-ocean-850/95 p-4 shadow-inst backdrop-blur lg:block">
+                  <div className="mb-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={clearDrawer}
+                      disabled={qLoading}
+                      className="rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-ink-dim hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {t.clear}
+                    </button>
                   </div>
-                )}
-
-                <div className="flex items-center gap-2">
-                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${selectedZone.confidence === 'High' ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-amber-100 text-amber-700 border border-amber-300'}`}>
-                    {t.confidence}: {selectedZone.confidence}
-                  </span>
+                  {drawerContent}
                 </div>
-              </div>
-            )}
+              )}
+              <AskOrca
+                ref={askInputRef}
+                onSubmit={handleSubmit}
+                loading={qLoading}
+                lang={lang}
+                t={t}
+              />
+            </div>
+          </main>
 
-            {/* Query response */}
-            {!isLoading && responseData && (
-              <div className="py-3 space-y-3">
-                <p className="text-lg font-semibold text-gray-800 leading-relaxed">{responseData.text}</p>
-
-                {/* Evidence chips */}
-                {activeConditions && (
-                  <div className="flex flex-wrap gap-1.5">
-                    <span className="px-2 py-1 bg-blue-50 border border-blue-200 rounded-full text-xs font-bold text-blue-700">{t.sst} {activeConditions.sst}</span>
-                    <span className="px-2 py-1 bg-green-50 border border-green-200 rounded-full text-xs font-bold text-green-700">{t.chla} {activeConditions.chlorophyll}</span>
-                    <span className="px-2 py-1 bg-gray-100 border border-gray-200 rounded-full text-xs font-bold text-gray-500">{t.asOf} {activeUpdated} · {activeSource}</span>
-                  </div>
-                )}
-
-                {/* Reasoning trail */}
-                {responseData.reasoning_trail?.length > 0 && (
-                  <details className="group">
-                    <summary className="flex items-center gap-1.5 text-sm font-bold text-blue-600 cursor-pointer select-none py-1">
-                      <Info size={14} /> {t.howItKnows}
-                      <ChevronDown size={14} className="group-open:hidden" />
-                      <ChevronUp size={14} className="hidden group-open:block" />
-                    </summary>
-                    <div className="mt-2 space-y-1.5 pl-1">
-                      {responseData.reasoning_trail.map((step, i) => (
-                        <div key={i} className="flex items-start gap-2">
-                          <span className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${step.status === 'done' ? 'bg-green-500' : 'bg-amber-400'}`}></span>
-                          <p className="text-xs text-gray-600"><span className="font-bold text-gray-800">{step.agent}</span> — {step.result || step.action}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </details>
-                )}
-              </div>
-            )}
-
-            {/* Default collapsed text */}
-            {!isLoading && !responseData && !selectedZone && (
-              <p className="text-sm text-gray-400 py-3 text-center">{t.defaultText}</p>
-            )}
-          </div>
+          {/* ── Right intelligence column ── */}
+          <aside
+            className={
+              mapFocus
+                ? 'hidden'
+                : 'hidden w-[360px] shrink-0 flex-col overflow-y-auto border-l border-hairline bg-ocean-850/60 lg:flex'
+            }
+          >
+            <AIInsights
+              insights={insights}
+              loading={dashLoading && !conditions}
+              onAction={handleInsightAction}
+              t={t}
+            />
+            <ConditionsStrip
+              conditions={conditions}
+              safetyStatus={safetyStatus}
+              loading={dashLoading && !conditions}
+              t={t}
+            />
+            <AlertsPanel alerts={alerts} loading={dashLoading && !conditions} t={t} />
+          </aside>
         </div>
       </div>
+
+      {/* ── Mobile navigation + sheet ── */}
+      <MobileNav
+        activeNav={activeNav}
+        onNav={handleNav}
+        alertCount={alerts.length}
+        t={t}
+      />
+
+      <BottomSheet
+        open={!!mobileSheet}
+        title={sheetTitle}
+        closeLabel={t.close}
+        onClose={() => setMobileSheet(null)}
+      >
+        {mobileSheet === 'response' || mobileSheet === 'zone' ? drawerContent : null}
+        {mobileSheet === 'conditions' && (
+          <ConditionsStrip
+            conditions={conditions}
+            safetyStatus={safetyStatus}
+            loading={dashLoading && !conditions}
+            t={t}
+            className="border-0 p-0"
+          />
+        )}
+        {mobileSheet === 'insights' && (
+          <AIInsights
+            insights={insights}
+            loading={dashLoading && !conditions}
+            onAction={handleInsightAction}
+            t={t}
+            className="border-0 p-0"
+          />
+        )}
+        {mobileSheet === 'alerts' && (
+          <AlertsPanel alerts={alerts} loading={dashLoading && !conditions} t={t} className="p-0" />
+        )}
+      </BottomSheet>
+
+      {modal === 'reports' && (
+        <ReportPanel
+          conditions={conditions}
+          pfzZones={pfzZones}
+          safetyStatus={safetyStatus}
+          t={t}
+          onClose={closeModal}
+        />
+      )}
+      {modal === 'settings' && (
+        <SettingsPanel
+          lang={lang}
+          onLang={changeLang}
+          systemStatus={systemStatus}
+          reducedMotion={reducedMotion}
+          onRetry={loadData}
+          t={t}
+          onClose={closeModal}
+        />
+      )}
     </div>
   )
 }
 
-export default App
+/* ── Small local pieces ── */
+
+function LayerToggle({ active, onClick, dot, label }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={
+        'flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ' +
+        (active ? 'text-ink' : 'text-ink-dim hover:text-ink')
+      }
+    >
+      <span
+        className="h-2.5 w-2.5 rounded-full border transition-opacity"
+        style={{
+          background: active ? dot : 'transparent',
+          borderColor: dot,
+          opacity: active ? 1 : 0.5,
+        }}
+      />
+      {label}
+    </button>
+  )
+}
+
+function fmtReadout([lat, lng]) {
+  if (!isNum(lat) || !isNum(lng)) return '-- --'
+  const p = (x, a, b) => `${Math.abs(x).toFixed(3)}° ${x >= 0 ? a : b}`
+  return `${p(lat, 'N', 'S')}  ${p(lng, 'E', 'W')}`
+}

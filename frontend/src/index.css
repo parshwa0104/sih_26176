@@ -3,19 +3,144 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
-  background-color: #F8F9FA;
-  color: #111827;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ============================================================
+   ORCA — Ocean Operations Center · design tokens
+   ============================================================ */
+:root {
+  --ocean-900: #F0F4F8;
+  --ocean-850: #FFFFFF;
+  --ocean-800: #E2E8F0;
+  --surface-1: #FFFFFF;
+  --surface-2: #F8FAFC;
+  --surface-3: #F1F5F9;
+  --accent: #0369A1;
+  --accent-bright: #0284C7;
+  --accent-deep: #0C4A6E;
+  --marine: #0F766E;
+  --safe: #15803D;
+  --caution: #B45309;
+  --danger: #B91C1C;
+  --ink: #0F172A;
+  --ink-dim: #475569;
+  --hairline: rgba(0, 0, 0, 0.15);
+  --hairline-strong: rgba(0, 0, 0, 0.25);
+  color-scheme: light;
 }
 
-/* Leaflet map styles container */
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--ocean-900);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Signature motif: faint sonar contour field behind the whole console */
+.orca-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 620px at 12% -12%, rgba(3, 105, 161, 0.05), transparent 60%),
+    radial-gradient(900px 520px at 112% 118%, rgba(15, 118, 110, 0.04), transparent 60%),
+    repeating-radial-gradient(circle at 14% 22%, rgba(0, 0, 0, 0.02) 0 1px, transparent 1px 46px);
+}
+
+/* Focus visibility */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(54, 207, 255, 0.25) transparent;
+}
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: rgba(54, 207, 255, 0.22); border-radius: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* ============================================================
+   Leaflet — dark ocean chart theme
+   ============================================================ */
 .leaflet-container {
   width: 100%;
   height: 100%;
-  border-radius: 0.5rem;
-  z-index: 10;
+  background: var(--ocean-850);
+  font-family: inherit;
+  z-index: 0;
+}
+
+/* Keep true map colours and just boost contrast slightly. */
+.leaflet-tile-pane {
+  filter: contrast(1.05) brightness(1.02);
+}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--surface-1);
+  color: var(--ink);
+  border: 1px solid var(--hairline-strong);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
+.leaflet-popup-content-wrapper { border-radius: 10px; }
+.leaflet-popup-content { margin: 9px 12px; font-size: 12px; line-height: 1.45; }
+.leaflet-container a.leaflet-popup-close-button { color: var(--ink-dim); }
+.leaflet-container a.leaflet-popup-close-button:hover { color: var(--ink); }
+.leaflet-tooltip {
+  background: var(--surface-1);
+  border: 1px solid var(--hairline-strong);
+  color: var(--ink);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  border-radius: 7px;
+  font-size: 11px;
+  padding: 4px 8px;
+}
+.leaflet-tooltip-top::before { border-top-color: var(--hairline-strong); }
+.leaflet-control-attribution {
+  background: rgba(3, 21, 37, 0.72) !important;
+  color: #6b86a3 !important;
+  font-size: 10px !important;
+  backdrop-filter: blur(4px);
+}
+.leaflet-control-attribution a { color: var(--accent) !important; }
+
+/* Map markers (Leaflet divIcon) */
+.orca-marker { background: transparent; border: 0; }
+.orca-dot {
+  position: relative;
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  border: 2px solid #FFFFFF;
+}
+.orca-dot-ping {
+  position: absolute;
+  inset: -5px;
+  border-radius: 9999px;
+  border: 2px solid;
+  opacity: 0.6;
+  animation: orca-ping 2.4s ease-out infinite;
+}
+
+/* ============================================================
+   Motion — respect user preference
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

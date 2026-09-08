@@ -1,0 +1,109 @@
+.orca-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 108px;
+  height: 108px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.core-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(45, 212, 245, 0.22);
+}
+
+.ring-outer {
+  animation: coreSpin 24s linear infinite;
+  border-style: dashed;
+}
+
+.ring-mid {
+  inset: 14px;
+  border-color: rgba(45, 212, 245, 0.32);
+  animation: coreSpin 16s linear infinite reverse;
+}
+
+.core-glow {
+  position: absolute;
+  inset: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(45, 212, 245, 0.5), rgba(45, 212, 245, 0) 70%);
+  filter: blur(2px);
+  animation: coreBreathe 3.6s ease-in-out infinite;
+}
+
+.core-body {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #04121f;
+  background: linear-gradient(135deg, #7fe6fa, #2dd4f5 55%, #1aa9c9);
+  box-shadow: 0 0 30px rgba(45, 212, 245, 0.45), inset 0 0 12px rgba(255, 255, 255, 0.35);
+  z-index: 2;
+}
+
+.core-label {
+  position: absolute;
+  bottom: -20px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--ink-dim);
+}
+
+@keyframes coreSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes coreBreathe {
+  0%, 100% { opacity: 0.55; transform: scale(0.94); }
+  50% { opacity: 0.9; transform: scale(1.04); }
+}
+
+/* --- state variants --- */
+
+.state-idle .core-glow { animation-duration: 4.6s; opacity: 0.6; }
+.state-idle .ring-outer, .state-idle .ring-mid { opacity: 0.5; }
+
+.state-waking .core-body {
+  animation: corePop 0.7s ease-out;
+}
+.state-waking .core-glow { animation-duration: 1.4s; }
+.state-waking .ring-outer { animation-duration: 6s; }
+.state-waking .ring-mid { animation-duration: 4s; }
+
+.state-active .ring-outer { animation-duration: 8s; }
+.state-active .ring-mid { animation-duration: 5.5s; }
+.state-active .core-glow { animation-duration: 2.2s; }
+.state-active .core-body { box-shadow: 0 0 38px rgba(45, 212, 245, 0.6), inset 0 0 12px rgba(255, 255, 255, 0.35); }
+
+.state-converging .ring-outer { animation-duration: 3s; border-color: rgba(127, 230, 250, 0.55); }
+.state-converging .ring-mid { animation-duration: 2s; border-color: rgba(127, 230, 250, 0.7); }
+.state-converging .core-glow { animation-duration: 1s; opacity: 0.95; }
+.state-converging .core-body {
+  box-shadow: 0 0 52px rgba(127, 230, 250, 0.85), inset 0 0 16px rgba(255, 255, 255, 0.5);
+  transform: scale(1.08);
+}
+
+.state-synthesis .core-body {
+  background: linear-gradient(135deg, #9dfbe4, #2bd08a 55%, #14947a);
+  box-shadow: 0 0 30px rgba(43, 208, 138, 0.5), inset 0 0 12px rgba(255, 255, 255, 0.35);
+}
+.state-synthesis .ring-outer, .state-synthesis .ring-mid { border-color: rgba(43, 208, 138, 0.3); animation-duration: 30s; }
+.state-synthesis .core-glow { background: radial-gradient(circle, rgba(43, 208, 138, 0.45), rgba(43, 208, 138, 0) 70%); animation-duration: 4s; }
+
+@keyframes corePop {
+  0% { transform: scale(0.7); }
+  60% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
