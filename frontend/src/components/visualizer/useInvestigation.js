@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { agents, synthesisResult } from '../data/mockData.js'
+import { agents, synthesisResult } from './mockData.js'
 
 // Investigation phases, matching the animation narrative:
 // idle -> activating (CORE) -> agents (AGENTS) -> converging (DATA + CONVERGENCE) -> synthesis (SYNTHESIS)
