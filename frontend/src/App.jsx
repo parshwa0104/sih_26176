@@ -24,6 +24,9 @@ import ReportPanel from './components/ReportPanel'
 import SettingsPanel from './components/SettingsPanel'
 import Login from './components/Login'
 import { useAuth } from './contexts/AuthContext'
+import LayerToggle from './components/LayerToggle'
+import InvestigationView from './components/visualizer/InvestigationView'
+import { useInvestigation } from './components/visualizer/useInvestigation'
 
 const DEFAULT_CENTER = [15, 76] // Arabian Sea overview
 const LANG_KEY = 'orca.lang'
@@ -143,6 +146,7 @@ export default function App() {
   const [response, setResponse] = useState(null)
   const [queryMapData, setQueryMapData] = useState(null)
   const [selectedZone, setSelectedZone] = useState(null)
+  const investigation = useInvestigation()
 
   /* ── UI shell state ── */
   const [activeNav, setActiveNav] = useState('home')
@@ -194,6 +198,7 @@ export default function App() {
       setQLoading(true)
       setActiveNav('ask')
       if (isMobile) setMobileSheet('response')
+      investigation.start(q)
 
       const full = LANG_FULL[lang] || 'english'
       try {
@@ -215,7 +220,7 @@ export default function App() {
         setQLoading(false)
       }
     },
-    [isMobile, lang],
+    [isMobile, lang, investigation],
   )
 
   const lastQueryRef = useRef('')
@@ -308,9 +313,9 @@ export default function App() {
   /* ── Drawer content (shared desktop drawer + mobile sheet) ── */
   const drawerActive = qLoading || qError || response || selectedZone
   const drawerContent =
-    qLoading || qError || response ? (
+    qError || response ? (
       <OrcaResponse
-        loading={qLoading}
+        loading={false}
         error={qError}
         data={response}
         activeConditions={activeConditions}
@@ -410,6 +415,12 @@ export default function App() {
               t={t}
             />
 
+            {qLoading && (
+              <div className="absolute inset-0 z-[400] pointer-events-none">
+                <InvestigationView investigation={investigation} />
+              </div>
+            )}
+
             {/* Layer toggles */}
             <div className="absolute left-3 top-3 z-[500] rounded-xl border border-hairline bg-ocean-850/90 p-1 backdrop-blur">
               <LayerToggle
@@ -433,7 +444,7 @@ export default function App() {
 
             {/* Command console + response drawer */}
             <div className="absolute inset-x-2 bottom-[74px] z-[600] flex flex-col gap-2 sm:inset-x-3 lg:inset-x-auto lg:bottom-6 lg:left-6 lg:w-[min(640px,52vw)]">
-              {drawerActive && (
+              {drawerActive && !qLoading && drawerContent && (
                 <div className="hidden max-h-[46vh] animate-fade-up overflow-y-auto rounded-2xl border border-hairline-strong bg-ocean-850/95 p-4 shadow-inst backdrop-blur lg:block">
                   <div className="mb-2 flex justify-end">
                     <button
