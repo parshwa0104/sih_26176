@@ -34,9 +34,21 @@ class QueryRequest(BaseModel):
     message: str
 
 def _sse_stream(query: str):
-    for event in process_query_stream(query):
-        yield f"data: {json.dumps(event)}\n\n"
-    yield "data: [DONE]\n\n"
+    try:
+        for event in process_query_stream(query):
+            yield f"data: {json.dumps(event)}\n\n"
+        yield "data: [DONE]\n\n"
+    except Exception as e:
+        import traceback
+        err_msg = f"System Error: {str(e)} | Trace: {traceback.format_exc()}"
+        error_event = {
+            "type": "done",
+            "text": f"CRITICAL BACKEND ERROR:\n\n{err_msg}",
+            "map_data": None,
+            "reasoning_trail": [{"agent": "System", "action": "Error Handler", "status": "done", "result": str(e)}]
+        }
+        yield f"data: {json.dumps(error_event)}\n\n"
+        yield "data: [DONE]\n\n"
 
 @app.post("/query")
 def process_query_endpoint(request: QueryRequest):
