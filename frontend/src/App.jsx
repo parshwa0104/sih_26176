@@ -22,6 +22,8 @@ import ZoneDetails from './components/ZoneDetails'
 import BottomSheet from './components/BottomSheet'
 import ReportPanel from './components/ReportPanel'
 import SettingsPanel from './components/SettingsPanel'
+import Login from './components/Login'
+import { useAuth } from './contexts/AuthContext'
 
 const DEFAULT_CENTER = [15, 76] // Arabian Sea overview
 const LANG_KEY = 'orca.lang'
@@ -72,6 +74,9 @@ export default function App() {
   /* ── Environment ── */
   const isMobile = useMediaQuery('(max-width: 1023px)')
   const reducedMotion = useReducedMotion()
+
+  /* ── Auth ── */
+  const { currentUser } = useAuth()
 
   /* ── Dashboard data ── */
   const [conditions, setConditions] = useState(null)
@@ -333,6 +338,10 @@ export default function App() {
               : ''
 
   const mapFocus = activeNav === 'map'
+
+  if (!currentUser) {
+    return <Login />
+  }
 
   return (
     <div className="orca-bg relative flex h-[100dvh] w-full overflow-hidden bg-ocean-900 font-sans text-ink">
