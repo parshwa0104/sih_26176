@@ -69,10 +69,11 @@ export default function OceanMap({
         scrollWheelZoom
         className="h-full w-full"
       >
-        {/* High contrast light map tiles to match the light theme */}
+        {/* Keyless OSM raster tiles; recoloured to a dark ocean chart via a
+            CSS filter on .leaflet-tile-pane (vectors/markers are unaffected). */}
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; OpenStreetMap contributors'
           maxZoom={19}
         />
         <MapController center={center} zoom={zoom} onMove={onMove} />
