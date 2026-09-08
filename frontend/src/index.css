@@ -7,24 +7,24 @@
    ORCA — Ocean Operations Center · design tokens
    ============================================================ */
 :root {
-  --ocean-900: #031525;
-  --ocean-850: #061D32;
-  --ocean-800: #082641;
-  --surface-1: #0A2944;
-  --surface-2: #0D3352;
-  --surface-3: #103D60;
-  --accent: #22B8FF;
-  --accent-bright: #36CFFF;
-  --accent-deep: #0EA5E9;
-  --marine: #2DD4BF;
-  --safe: #2EE6A6;
-  --caution: #F5B942;
-  --danger: #FF5C5C;
-  --ink: #F4FAFF;
-  --ink-dim: #9DB8D0;
-  --hairline: rgba(54, 207, 255, 0.20);
-  --hairline-strong: rgba(54, 207, 255, 0.35);
-  color-scheme: dark;
+  --ocean-900: #F0F4F8;
+  --ocean-850: #FFFFFF;
+  --ocean-800: #E2E8F0;
+  --surface-1: #FFFFFF;
+  --surface-2: #F8FAFC;
+  --surface-3: #F1F5F9;
+  --accent: #0369A1;
+  --accent-bright: #0284C7;
+  --accent-deep: #0C4A6E;
+  --marine: #0F766E;
+  --safe: #15803D;
+  --caution: #B45309;
+  --danger: #B91C1C;
+  --ink: #0F172A;
+  --ink-dim: #475569;
+  --hairline: rgba(0, 0, 0, 0.15);
+  --hairline-strong: rgba(0, 0, 0, 0.25);
+  color-scheme: light;
 }
 
 html, body, #root {
@@ -49,9 +49,9 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(1200px 620px at 12% -12%, rgba(34, 184, 255, 0.10), transparent 60%),
-    radial-gradient(900px 520px at 112% 118%, rgba(45, 212, 191, 0.08), transparent 60%),
-    repeating-radial-gradient(circle at 14% 22%, rgba(54, 207, 255, 0.045) 0 1px, transparent 1px 46px);
+    radial-gradient(1200px 620px at 12% -12%, rgba(3, 105, 161, 0.05), transparent 60%),
+    radial-gradient(900px 520px at 112% 118%, rgba(15, 118, 110, 0.04), transparent 60%),
+    repeating-radial-gradient(circle at 14% 22%, rgba(0, 0, 0, 0.02) 0 1px, transparent 1px 46px);
 }
 
 /* Focus visibility */
@@ -81,10 +81,9 @@ body {
   z-index: 0;
 }
 
-/* Recolour the raster basemap into a dark ocean chart. Only the tile pane is
-   filtered, so vector overlays, markers and popups keep their true colours. */
+/* Keep true map colours and just boost contrast slightly. */
 .leaflet-tile-pane {
-  filter: invert(1) hue-rotate(180deg) grayscale(0.85) brightness(0.86) contrast(1.05);
+  filter: contrast(1.05) brightness(1.02);
 }
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
@@ -123,7 +122,7 @@ body {
   width: 14px;
   height: 14px;
   border-radius: 9999px;
-  border: 2px solid #05192b;
+  border: 2px solid #FFFFFF;
 }
 .orca-dot-ping {
   position: absolute;

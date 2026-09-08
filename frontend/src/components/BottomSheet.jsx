@@ -36,7 +36,7 @@ export default function BottomSheet({ open, title, onClose, closeLabel = 'Close'
         )}
       >
         <div className="flex justify-center pt-2.5">
-          <span className="h-1 w-10 rounded-full bg-white/15" />
+          <span className="h-1 w-10 rounded-full bg-black/15" />
         </div>
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-hairline bg-ocean-850/95 px-4 py-2.5 backdrop-blur">
           <h2 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-ink">
@@ -46,7 +46,7 @@ export default function BottomSheet({ open, title, onClose, closeLabel = 'Close'
             type="button"
             onClick={onClose}
             aria-label={closeLabel}
-            className="grid h-8 w-8 place-items-center rounded-lg text-ink-dim hover:bg-white/5"
+            className="grid h-8 w-8 place-items-center rounded-lg text-ink-dim hover:bg-black/5"
           >
             <X size={16} />
           </button>

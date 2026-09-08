@@ -1,7 +1,9 @@
 import Sonar from './Sonar'
 import StatusDot from './StatusDot'
+import { LogOut } from 'lucide-react'
 import { NAV_ITEMS } from '../lib/nav'
 import { cx } from '../lib/format'
+import { useAuth } from '../contexts/AuthContext'
 
 const STATUS_LABEL = {
   live: 'systemLive',
@@ -11,6 +13,8 @@ const STATUS_LABEL = {
 
 /** Desktop navigation rail — "navigation equipment", not a SaaS sidebar. */
 export default function Sidebar({ activeNav, onNav, systemStatus = 'connecting', alertCount = 0, t }) {
+  const { logout } = useAuth()
+
   return (
     <nav
       aria-label="Primary navigation"
@@ -45,7 +49,7 @@ export default function Sidebar({ activeNav, onNav, systemStatus = 'connecting',
                   'group relative grid h-12 w-12 place-items-center rounded-xl border transition-colors',
                   active
                     ? 'border-hairline-strong bg-accent/10 text-accent'
-                    : 'border-transparent text-ink-dim hover:bg-white/5 hover:text-ink',
+                    : 'border-transparent text-ink-dim hover:bg-black/5 hover:text-ink',
                 )}
               >
                 <Icon size={20} strokeWidth={1.75} />
@@ -62,6 +66,15 @@ export default function Sidebar({ activeNav, onNav, systemStatus = 'connecting',
       </ul>
 
       <div className="mt-auto flex flex-col items-center gap-1.5 pt-3">
+        <button
+          type="button"
+          onClick={logout}
+          className="group relative grid h-12 w-12 place-items-center rounded-xl border border-transparent text-status-danger transition-colors hover:bg-status-danger/10"
+          aria-label="Log Out"
+        >
+          <LogOut size={20} strokeWidth={1.75} />
+        </button>
+
         <StatusDot status={systemStatus} />
         <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-ink-dim">
           {t[STATUS_LABEL[systemStatus]] || t.systemConnecting}

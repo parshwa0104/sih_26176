@@ -49,7 +49,7 @@ export default function AIInsights({ insights = [], loading, onAction, t, classN
                     <button
                       type="button"
                       onClick={() => onAction?.(ins.action)}
-                      className="mt-1.5 inline-flex items-center gap-1 rounded-md border border-hairline px-2 py-1 text-[11px] font-semibold text-accent transition-colors hover:bg-white/5"
+                      className="mt-1.5 inline-flex items-center gap-1 rounded-md border border-hairline px-2 py-1 text-[11px] font-semibold text-accent transition-colors hover:bg-black/5"
                     >
                       {ins.action.type === 'map' ? t.viewOnMap : t.askAboutThis}
                       <ChevronRight size={11} />

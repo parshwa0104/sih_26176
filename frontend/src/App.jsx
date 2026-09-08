@@ -22,6 +22,10 @@ import ZoneDetails from './components/ZoneDetails'
 import BottomSheet from './components/BottomSheet'
 import ReportPanel from './components/ReportPanel'
 import SettingsPanel from './components/SettingsPanel'
+import Login from './components/Login'
+import { useAuth } from './contexts/AuthContext'
+import InvestigationView from './components/visualizer/InvestigationView'
+import { useInvestigation } from './components/visualizer/useInvestigation'
 
 const DEFAULT_CENTER = [15, 76] // Arabian Sea overview
 const LANG_KEY = 'orca.lang'
@@ -72,6 +76,9 @@ export default function App() {
   /* ── Environment ── */
   const isMobile = useMediaQuery('(max-width: 1023px)')
   const reducedMotion = useReducedMotion()
+
+  /* ── Auth ── */
+  const { currentUser } = useAuth()
 
   /* ── Dashboard data ── */
   const [conditions, setConditions] = useState(null)
@@ -138,6 +145,7 @@ export default function App() {
   const [response, setResponse] = useState(null)
   const [queryMapData, setQueryMapData] = useState(null)
   const [selectedZone, setSelectedZone] = useState(null)
+  const investigation = useInvestigation()
 
   /* ── UI shell state ── */
   const [activeNav, setActiveNav] = useState('home')
@@ -189,6 +197,7 @@ export default function App() {
       setQLoading(true)
       setActiveNav('ask')
       if (isMobile) setMobileSheet('response')
+      investigation.start(q)
 
       const full = LANG_FULL[lang] || 'english'
       try {
@@ -210,7 +219,7 @@ export default function App() {
         setQLoading(false)
       }
     },
-    [isMobile, lang],
+    [isMobile, lang, investigation],
   )
 
   const lastQueryRef = useRef('')
@@ -243,7 +252,7 @@ export default function App() {
   const handleInsightAction = useCallback(
     (action) => {
       if (!action) return
-      if (action.type === 'map' && Array.isArray(action.center) && isNum(action.center[0])) {
+      if (action.type === 'map' && Array.isArray(action.center) && isNum(action.center[0]) && isNum(action.center[1])) {
         setCenter(action.center)
         setZoom(action.zoom || 9)
         setActiveNav('map')
@@ -256,7 +265,7 @@ export default function App() {
   )
 
   const handleCenter = useCallback((c, z) => {
-    if (Array.isArray(c) && isNum(c[0])) {
+    if (Array.isArray(c) && isNum(c[0]) && isNum(c[1])) {
       setCenter(c)
       setZoom(z || 10)
       setMobileSheet(null)
@@ -303,9 +312,9 @@ export default function App() {
   /* ── Drawer content (shared desktop drawer + mobile sheet) ── */
   const drawerActive = qLoading || qError || response || selectedZone
   const drawerContent =
-    qLoading || qError || response ? (
+    qError || response ? (
       <OrcaResponse
-        loading={qLoading}
+        loading={false}
         error={qError}
         data={response}
         activeConditions={activeConditions}
@@ -333,6 +342,10 @@ export default function App() {
               : ''
 
   const mapFocus = activeNav === 'map'
+
+  if (!currentUser) {
+    return <Login />
+  }
 
   return (
     <div className="orca-bg relative flex h-[100dvh] w-full overflow-hidden bg-ocean-900 font-sans text-ink">
@@ -376,7 +389,7 @@ export default function App() {
             <button
               type="button"
               onClick={loadData}
-              className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1 text-xs font-semibold text-accent transition-colors hover:bg-white/5"
+              className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1 text-xs font-semibold text-accent transition-colors hover:bg-black/5"
             >
               <RefreshCw size={12} />
               {t.retry}
@@ -401,6 +414,12 @@ export default function App() {
               t={t}
             />
 
+            {qLoading && (
+              <div className="absolute inset-0 z-[400] pointer-events-none">
+                <InvestigationView investigation={investigation} />
+              </div>
+            )}
+
             {/* Layer toggles */}
             <div className="absolute left-3 top-3 z-[500] rounded-xl border border-hairline bg-ocean-850/90 p-1 backdrop-blur">
               <LayerToggle
@@ -424,13 +443,14 @@ export default function App() {
 
             {/* Command console + response drawer */}
             <div className="absolute inset-x-2 bottom-[74px] z-[600] flex flex-col gap-2 sm:inset-x-3 lg:inset-x-auto lg:bottom-6 lg:left-6 lg:w-[min(640px,52vw)]">
-              {drawerActive && (
+              {drawerActive && !qLoading && drawerContent && (
                 <div className="hidden max-h-[46vh] animate-fade-up overflow-y-auto rounded-2xl border border-hairline-strong bg-ocean-850/95 p-4 shadow-inst backdrop-blur lg:block">
                   <div className="mb-2 flex justify-end">
                     <button
                       type="button"
                       onClick={clearDrawer}
-                      className="rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-ink-dim hover:text-ink"
+                      disabled={qLoading}
+                      className="rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-ink-dim hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {t.clear}
                     </button>

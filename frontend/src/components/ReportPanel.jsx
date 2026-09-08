@@ -73,7 +73,7 @@ export default function ReportPanel({ conditions, pfzZones = [], safetyStatus, t
       <button
         type="button"
         onClick={copy}
-        className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-hairline px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-white/5"
+        className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-hairline px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-black/5"
       >
         {copied ? <Check size={13} /> : <Copy size={13} />}
         {copied ? t.copied : t.copyBrief}

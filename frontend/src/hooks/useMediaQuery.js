@@ -6,8 +6,12 @@ export function useMediaQuery(query) {
     (onChange) => {
       if (typeof window === 'undefined' || !window.matchMedia) return () => {}
       const mql = window.matchMedia(query)
-      mql.addEventListener?.('change', onChange)
-      return () => mql.removeEventListener?.('change', onChange)
+      if (mql.addEventListener) {
+        mql.addEventListener('change', onChange)
+        return () => mql.removeEventListener('change', onChange)
+      }
+      mql.addListener(onChange)
+      return () => mql.removeListener(onChange)
     },
     () =>
       typeof window !== 'undefined' && window.matchMedia
