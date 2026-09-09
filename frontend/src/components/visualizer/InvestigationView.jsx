@@ -17,6 +17,7 @@ const coreStateByPhase = {
 export default function InvestigationView({ investigation }) {
   const { phase, query, agentStatus, activeAgentIndex, timeline } = investigation
   const showRunline = phase === PHASES.AGENTS || phase === PHASES.CONVERGING
+  const showSynthesis = phase === PHASES.SYNTHESIS
 
   return (
     <div className="investigation-view">
