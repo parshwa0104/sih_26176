@@ -1,10 +1,12 @@
 import { useEffect, useState, useMemo } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet'
-import { Plus, Minus, LocateFixed } from 'lucide-react'
+import { Plus, Minus, LocateFixed, Navigation } from 'lucide-react'
 import PfzLayer from './PfzLayer'
 import SeaStateLayer from './SeaStateLayer'
 import QueryOverlay from './QueryOverlay'
+import MapCard from './MapCard'
 import { vesselIcon } from '../lib/mapIcons'
+import { CHART } from '../lib/chartColors'
 import { isNum, cx } from '../lib/format'
 import debounce from 'lodash.debounce'
 
@@ -56,7 +58,7 @@ export default function OceanMap({
   const [map, setMap] = useState(null)
 
   const ctrlBtn =
-    'grid h-9 w-9 place-items-center text-ink-dim transition-colors hover:bg-black/5 hover:text-ink disabled:opacity-30'
+    'grid h-10 w-10 place-items-center text-ink-dim transition-colors hover:bg-black/5 hover:text-ink disabled:opacity-30'
 
   return (
     <div className="absolute inset-0">
@@ -69,8 +71,8 @@ export default function OceanMap({
         scrollWheelZoom
         className="h-full w-full"
       >
-        {/* Keyless OSM raster tiles; recoloured to a dark ocean chart via a
-            CSS filter on .leaflet-tile-pane (vectors/markers are unaffected). */}
+        {/* Keyless OSM raster tiles, pulled toward a monochrome bathymetric
+            chart by a CSS filter on .leaflet-tile-pane (vectors are untouched). */}
         <TileLayer
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; OpenStreetMap contributors'
@@ -81,7 +83,12 @@ export default function OceanMap({
         {userLoc && isNum(userLoc.lat) && isNum(userLoc.lng) && (
           <Marker position={[userLoc.lat, userLoc.lng]} icon={vesselIcon}>
             <Popup>
-              <b>{userLoc.label || t.vessel}</b>
+              <MapCard
+                accent={CHART.vessel}
+                icon={Navigation}
+                title={userLoc.label || t.vessel}
+                rows={[['LAT', userLoc.lat.toFixed(3)], ['LNG', userLoc.lng.toFixed(3)]]}
+              />
             </Popup>
           </Marker>
         )}

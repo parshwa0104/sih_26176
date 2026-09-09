@@ -31,21 +31,22 @@ export default function Header({
       <BrandMark descriptor={t.productName} className="hidden sm:flex" />
       <BrandMark compact className="sm:hidden" />
 
-      <form onSubmit={submit} className="mx-auto hidden w-full max-w-sm lg:block">
-        <div className="flex h-9 items-center gap-2 rounded-lg border border-hairline bg-surface-1/50 px-3 focus-within:border-hairline-strong">
+      {/* Locate: a tool in the flow next to identity, not a centred hero field. */}
+      <form onSubmit={submit} className="ml-3 hidden w-[240px] shrink-0 lg:block xl:w-[280px]">
+        <div className="flex h-9 items-center gap-field rounded-xl border border-hairline bg-surface-1/50 px-3 focus-within:border-hairline-strong">
           <Search size={15} className="shrink-0 text-ink-dim" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={t.searchPlaceholder}
             aria-label={t.searchPlaceholder}
-            className="min-w-0 flex-1 bg-transparent text-sm text-ink placeholder:text-ink-dim/70 focus:outline-none"
+            className="min-w-0 flex-1 bg-transparent text-body text-ink placeholder:text-ink-dim/70 focus:outline-none"
           />
         </div>
       </form>
 
       <div className="ml-auto flex items-center gap-2">
-        <div className="hidden items-center gap-1.5 rounded-lg border border-hairline bg-surface-1/50 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-ink-dim md:flex">
+        <div className="hidden items-center gap-field rounded-xl border border-hairline bg-surface-1/50 px-2.5 py-1.5 font-mono text-meta uppercase text-ink-dim md:flex">
           <StatusDot status={systemStatus} />
           <span>{systemStatus === 'live' ? t.systemLive : systemStatus === 'offline' ? t.systemOffline : t.systemConnecting}</span>
         </div>
@@ -54,11 +55,11 @@ export default function Header({
           type="button"
           onClick={onBell}
           aria-label={t.alertsTitle}
-          className="relative grid h-9 w-9 place-items-center rounded-lg border border-hairline bg-surface-1/50 text-ink-dim transition-colors hover:text-ink"
+          className="relative grid h-10 w-10 place-items-center rounded-xl border border-hairline bg-surface-1/50 text-ink-dim transition-colors hover:text-ink"
         >
           <Bell size={17} />
           {alertCount > 0 && (
-            <span className="absolute -right-1 -top-1 grid h-4 min-w-[16px] place-items-center rounded-full bg-status-danger px-1 text-[10px] font-bold text-ocean-900">
+            <span className="absolute -right-1 -top-1 grid h-4 min-w-[16px] place-items-center rounded-full bg-status-danger px-1 text-meta font-bold text-white">
               {alertCount}
             </span>
           )}
@@ -68,17 +69,17 @@ export default function Header({
 
         <div
           className={cx(
-            'hidden items-center gap-2 rounded-lg border border-hairline bg-surface-1/50 py-1.5 pl-1.5 pr-3 xl:flex',
+            'hidden items-center gap-2 rounded-xl border border-hairline bg-surface-1/50 py-1.5 pl-1.5 pr-3 xl:flex',
           )}
         >
-          <span className="grid h-6 w-6 place-items-center rounded-md bg-accent/15 text-accent">
+          <span className="grid h-6 w-6 place-items-center rounded-xl bg-accent/15 text-accent">
             <User size={14} />
           </span>
           <span className="leading-none">
-            <span className="block text-xs font-semibold text-ink">{t.profile}</span>
-            <span className="mt-0.5 flex items-center gap-1 text-[10px] text-ink-dim">
+            <span className="block text-caption font-semibold text-ink">{t.profile}</span>
+            <span className="mt-0.5 flex items-center gap-1 text-meta text-ink-dim">
               <MapPin size={9} />
-              {homePort || '—'}
+              {homePort || '-'}
             </span>
           </span>
         </div>

@@ -13,15 +13,22 @@ const SEV = {
 const ICON_BY_ID = { pfz: Fish, cond: TrendingUp, wind: WavesIcon, safety: ShieldAlert, alert: Bell }
 
 /** AI insights — a scannable list derived from live data, each row actionable. */
-export default function AIInsights({ insights = [], loading, onAction, t, className = '' }) {
+export default function AIInsights({
+  insights = [],
+  loading,
+  onAction,
+  t,
+  className = '',
+  hideHeader = false,
+}) {
   return (
-    <section className={cx('border-b border-hairline p-4', className)} aria-label={t.insightsTitle}>
-      <div className="flex items-center gap-2">
-        <Sonar size={16} active={false} />
-        <h2 className="font-display text-xs font-semibold uppercase tracking-[0.18em] text-ink">
-          {t.insightsTitle}
-        </h2>
-      </div>
+    <section className={cx('border-b border-hairline p-block', className)} aria-label={t.insightsTitle}>
+      {!hideHeader && (
+        <div className="flex items-center gap-field">
+          <Sonar size={16} active={false} />
+          <h2 className="font-display text-caption font-semibold text-ink">{t.insightsTitle}</h2>
+        </div>
+      )}
 
       {loading ? (
         <div className="mt-3 space-y-2">
@@ -30,9 +37,9 @@ export default function AIInsights({ insights = [], loading, onAction, t, classN
           <Skeleton className="h-12" />
         </div>
       ) : insights.length === 0 ? (
-        <p className="mt-3 text-sm text-ink-dim">{t.noInsights}</p>
+        <p className="mt-3 text-body text-ink-dim">{t.noInsights}</p>
       ) : (
-        <ul className="mt-2 divide-y divide-hairline">
+        <ul className="mt-2 animate-fade-up divide-y divide-hairline">
           {insights.map((ins) => {
             const sev = SEV[ins.severity] || SEV.accent
             const Icon = ICON_BY_ID[ins.id] || sev.Icon
@@ -43,13 +50,13 @@ export default function AIInsights({ insights = [], loading, onAction, t, classN
                   <Icon size={15} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-ink">{ins.title}</p>
-                  <p className="mt-0.5 text-xs leading-relaxed text-ink-dim">{ins.detail}</p>
+                  <p className="text-body font-semibold text-ink">{ins.title}</p>
+                  <p className="mt-0.5 text-caption leading-relaxed text-ink-dim">{ins.detail}</p>
                   {ins.action && (
                     <button
                       type="button"
                       onClick={() => onAction?.(ins.action)}
-                      className="mt-1.5 inline-flex items-center gap-1 rounded-md border border-hairline px-2 py-1 text-[11px] font-semibold text-accent transition-colors hover:bg-black/5"
+                      className="mt-1.5 inline-flex items-center gap-1 rounded-xl border border-hairline px-2 py-1 text-label text-accent transition-colors hover:bg-black/5"
                     >
                       {ins.action.type === 'map' ? t.viewOnMap : t.askAboutThis}
                       <ChevronRight size={11} />

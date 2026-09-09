@@ -13,9 +13,9 @@ export default function ReasoningTrail({ steps = [], t }) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-accent"
+        className="flex w-full items-center justify-between px-3 py-2 text-label text-accent"
       >
-        <span className="flex items-center gap-1.5">
+        <span className="flex items-center gap-field">
           <Cpu size={13} />
           {t.howItKnows}
         </span>
@@ -43,13 +43,13 @@ export default function ReasoningTrail({ steps = [], t }) {
                   {done ? <Check size={10} /> : <Loader2 size={10} className="animate-spin" />}
                 </span>
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold text-ink">
+                  <p className="text-caption font-semibold text-ink">
                     {s.agent}
-                    <span className="ml-2 font-mono text-[9px] font-normal uppercase tracking-wider text-ink-dim">
+                    <span className="ml-2 font-mono text-meta font-normal text-ink-dim">
                       {done ? t.stepDone : t.stepRunning}
                     </span>
                   </p>
-                  <p className="mt-0.5 text-xs leading-relaxed text-ink-dim">
+                  <p className="mt-0.5 text-caption leading-relaxed text-ink-dim">
                     {s.result || s.action}
                   </p>
                 </div>

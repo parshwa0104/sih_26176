@@ -27,7 +27,7 @@ const AskOrca = forwardRef(function AskOrca({ onSubmit, loading, lang, t, classN
     <form
       onSubmit={submit}
       className={cx(
-        'rounded-2xl border border-hairline-strong bg-ocean-850/95 p-2 shadow-inst backdrop-blur',
+        'rounded-xl border border-hairline-strong bg-ocean-850/95 p-2 shadow-inst backdrop-blur',
         className,
       )}
     >
@@ -53,7 +53,7 @@ const AskOrca = forwardRef(function AskOrca({ onSubmit, loading, lang, t, classN
           disabled={loading}
           placeholder={loading ? t.analyzing : t.placeholder}
           autoComplete="off"
-          className="min-w-0 flex-1 bg-transparent px-1 text-[15px] font-medium text-ink placeholder:text-ink-dim/70 focus:outline-none disabled:opacity-60"
+          className="min-w-0 flex-1 bg-transparent px-1 text-input text-ink placeholder:text-ink-dim/70 focus:outline-none disabled:opacity-60"
         />
 
         {supported && (
@@ -78,12 +78,17 @@ const AskOrca = forwardRef(function AskOrca({ onSubmit, loading, lang, t, classN
           type="submit"
           disabled={loading || !value.trim()}
           aria-label={t.send}
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent text-ocean-900 transition-colors hover:bg-accent-bright disabled:opacity-40"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent text-white transition-colors hover:bg-accent-bright disabled:opacity-40"
         >
           <Send size={18} />
         </button>
       </div>
-      <p className="mt-1 truncate px-2 text-[10px] font-mono uppercase tracking-[0.14em] text-ink-dim/70">
+      <p
+        className={cx(
+          'mt-1 truncate px-2 font-mono text-meta text-ink-dim/70',
+          !listening && 'hidden sm:block [@media(max-height:480px)]:hidden',
+        )}
+      >
         {listening ? t.listening : t.askHint}
       </p>
     </form>

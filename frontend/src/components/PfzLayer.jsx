@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { Circle, Marker, Tooltip } from 'react-leaflet'
 import { pfzIcon } from '../lib/mapIcons'
+import { CHART } from '../lib/chartColors'
 import { isNum } from '../lib/format'
 
 const fillFor = (confidence) =>
@@ -16,9 +17,9 @@ export default function PfzLayer({ zones = [], onZoneTap }) {
           center={[z.lat, z.lng]}
           radius={isNum(z.radius) ? z.radius : 10000}
           pathOptions={{
-            color: '#2EE6A6',
+            color: CHART.pfz,
             weight: 1.5,
-            fillColor: '#2EE6A6',
+            fillColor: CHART.pfz,
             fillOpacity: fillFor(z.confidence),
           }}
           eventHandlers={{ click: () => onZoneTap?.(z) }}
@@ -29,9 +30,9 @@ export default function PfzLayer({ zones = [], onZoneTap }) {
           eventHandlers={{ click: () => onZoneTap?.(z) }}
         >
           <Tooltip direction="top" offset={[0, -6]} opacity={1}>
-            <span className="font-mono text-[11px]">
+            <span className="font-mono text-meta">
               {z.label}
-              {z.species ? ` · ${z.species}` : ''}
+              {z.species ? `, ${z.species}` : ''}
             </span>
           </Tooltip>
         </Marker>
