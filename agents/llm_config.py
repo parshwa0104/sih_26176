@@ -10,23 +10,36 @@ except ImportError:
     _has_ollama = False
 
 def get_llm(temperature: float = 0.0):
-    # 1. Primary: Groq (Qwen 3.6 27B — replaces decommissioned llama-3.3-70b-versatile)
-    groq_llm = ChatGroq(model="qwen/qwen3.6-27b", temperature=temperature)
+    fallbacks = []
+    primary_llm = None
     
-    # 2. Secondary: Google Gemini (Gemini 1.5 Flash)
-    gemini_llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=temperature)
-    
-    # Build fallback chain
-    fallbacks = [gemini_llm]
-
-    # 3. Tertiary: Local Ollama (only if running locally)
+    # Check for local Ollama
+    ollama_llm = None
     if _has_ollama:
-        ollama_llm = ChatOllama(model="llama3", temperature=temperature)
+        ollama_llm = ChatOllama(model="llama3", base_url="http://localhost:11434", temperature=temperature)
+
+    # Check for Groq API Key
+    if os.getenv("GROQ_API_KEY"):
+        primary_llm = ChatGroq(model="qwen/qwen3.6-27b", temperature=temperature)
+    
+    # Check for Gemini API Key
+    if os.getenv("GOOGLE_API_KEY"):
+        gemini_llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=temperature)
+        fallbacks.append(gemini_llm)
+
+    # Append Ollama as the last fallback if available
+    if ollama_llm:
         fallbacks.append(ollama_llm)
 
-    llm_with_fallbacks = groq_llm.with_fallbacks(fallbacks)
-    
-    return llm_with_fallbacks
+    # Construct the final chain
+    if primary_llm:
+        return primary_llm.with_fallbacks(fallbacks) if fallbacks else primary_llm
+    elif fallbacks:
+        # If no Groq, use the first available fallback as primary (Gemini or Ollama)
+        primary = fallbacks.pop(0)
+        return primary.with_fallbacks(fallbacks) if fallbacks else primary
+    else:
+        raise ValueError("No LLM available. Please set GROQ_API_KEY or install/run Ollama locally.")
 
 # Pre-instantiate common configurations
 llm_deterministic = get_llm(temperature=0.0)
