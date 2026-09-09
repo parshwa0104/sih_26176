@@ -7,6 +7,9 @@ response_prompt = PromptTemplate.from_template(
     """You are ORCA, a marine intelligence AI. You are explaining the results of a data query to a fisherman.
 Keep it simple, clear, and short. The fisherman may have low literacy. Use plain language.
 
+Chat History:
+{chat_history}
+
 User Query: {query}
 Target Language: {language}
 
@@ -17,11 +20,13 @@ Safety Data: {safety_data}
 Geofence Data: {geofence_data}
 Historical Data: {historical_data}
 Route Data: {route_data}
+SOS Data: {sos_data}
 
 INSTRUCTIONS:
 1. Write a short (2-4 sentences), clear answer based on the Data Context above.
-2. If the Target Language is not English, translate the answer to that language.
-3. Output ONLY the plain answer text. Do NOT use JSON, markdown, or backticks.
+2. If this is an emergency (SOS Data is present), prioritize giving the emergency contact numbers immediately in a calm, clear manner.
+3. If the Target Language is not English, translate the answer to that language.
+4. Output ONLY the plain answer text. Do NOT use JSON, markdown, or backticks.
 
 Answer:"""
 )
@@ -56,11 +61,21 @@ def get_map_data(pfz_data, safety_data, geofence_data, route_data, weather_data=
 
 def generate_response_stream(query: str, language: str, pfz_data: dict, weather_data: dict,
                               safety_data: dict, geofence_data: dict = None,
-                              historical_data: dict = None, route_data: dict = None):
+                              historical_data: dict = None, route_data: dict = None,
+                              sos_data: dict = None, history: list = None):
     """Stream the final natural-language response token by token.
     Strips <think>...</think> reasoning blocks from thinking models (e.g. Qwen).
     """
     chain = response_prompt | llm
+    
+    chat_history = ""
+    if history:
+        for msg in history[-4:]:
+            role = msg.get("role", "user")
+            content = msg.get("content", "")
+            chat_history += f"{role.upper()}: {content}\n"
+    if not chat_history.strip():
+        chat_history = "No previous context."
 
     # State for stripping <think> blocks:
     # None = haven't decided yet, True = inside think block, False = no think block
@@ -70,12 +85,14 @@ def generate_response_stream(query: str, language: str, pfz_data: dict, weather_
     for chunk in chain.stream({
         "query": query,
         "language": language,
+        "chat_history": chat_history,
         "pfz_data": pfz_data or "None",
         "weather_data": weather_data or "None",
         "safety_data": safety_data or "None",
         "geofence_data": geofence_data or "None",
         "historical_data": historical_data or "None",
         "route_data": route_data or "None",
+        "sos_data": sos_data or "None",
     }):
         if not chunk.content:
             continue

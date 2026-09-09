@@ -1,4 +1,4 @@
-import { MoreHorizontal } from 'lucide-react'
+import { MoreHorizontal, PhoneCall } from 'lucide-react'
 import { NAV_ITEMS, isNavActive } from '../lib/nav'
 import { cx } from '../lib/format'
 
@@ -32,7 +32,7 @@ function BarButton({ item, active, alertCount, t, onNav }) {
   )
 }
 
-export default function MobileNav({ navState, onNav, alertCount = 0, t }) {
+export default function MobileNav({ navState, onNav, alertCount = 0, t, onSos }) {
   const moreActive = navState.mobileSheet === 'more' || !!navState.modal
 
   return (
@@ -50,6 +50,15 @@ export default function MobileNav({ navState, onNav, alertCount = 0, t }) {
           onNav={onNav}
         />
       ))}
+
+      <button
+        type="button"
+        onClick={onSos}
+        className="relative flex flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-label transition-colors text-status-danger hover:bg-status-danger/10"
+      >
+        <PhoneCall size={20} strokeWidth={1.75} className="animate-pulse" />
+        <span className="font-bold">SOS</span>
+      </button>
 
       {hasMore && (
         <button

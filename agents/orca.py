@@ -10,9 +10,10 @@ from data.safety import calculate_safety
 from data.geofence import check_geofence
 from data.historical import get_historical_data
 from data.route import compute_safe_route, get_port_coords
+from data.sos import get_sos_contacts
 
 
-def process_query_stream(query: str):
+def process_query_stream(query: str, history: list = None):
     """
     Generator version of the ORCA pipeline for streaming.
     Yields:
@@ -23,7 +24,7 @@ def process_query_stream(query: str):
 
     # — Step 1: Intent Classification —
     reasoning_trail.append({"agent": "Intent Classifier", "action": "Analyzing user query...", "status": "running"})
-    intent_data = extract_intent(query)
+    intent_data = extract_intent(query, history)
     intent = intent_data.get("intent", "general")
     location = intent_data.get("location")
     date = intent_data.get("date", "today")
@@ -46,6 +47,7 @@ def process_query_stream(query: str):
     geofence_data = {"zones": [], "warning": None}
     historical_data = {}
     route_data = {}
+    sos_data = {}
 
     if intent == "pfz":
         reasoning_trail.append({"agent": "PFZ Data Agent", "action": f"Fetching PFZ data for {location}...", "status": "running"})
@@ -115,6 +117,13 @@ def process_query_stream(query: str):
         reasoning_trail[-1]["status"] = "done"
         reasoning_trail[-1]["result"] = f"Current SST: {weather_data.get('sst')}, Chlorophyll: {weather_data.get('chlorophyll')}"
 
+    elif intent == "sos":
+        reasoning_trail.append({"agent": "SOS Agent", "action": f"Fetching emergency contacts near {location}...", "status": "running"})
+        sos_data = get_sos_contacts(location)
+        safety_data = {"status": "danger"}  # Override safety status
+        reasoning_trail[-1]["status"] = "done"
+        reasoning_trail[-1]["result"] = "SOS Triggered. Emergency contacts retrieved."
+
     else:
         if location:
             reasoning_trail.append({"agent": "Data Agents", "action": f"Gathering all data for {location}...", "status": "running"})
@@ -138,6 +147,8 @@ def process_query_stream(query: str):
         geofence_data=geofence_data,
         historical_data=historical_data,
         route_data=route_data,
+        sos_data=sos_data,
+        history=history,
     ):
         full_text += token
         yield {"type": "token", "text": token}

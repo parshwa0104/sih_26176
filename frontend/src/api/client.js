@@ -23,7 +23,7 @@ export const getSeaState = () => getJSON('/sea-state')
  * onToken(text) fires per chunk; onDone(payload) fires once with the final
  * { text, map_data, reasoning_trail, safety_status }.
  */
-export async function sendQuery(message, { onToken, onDone, timeoutMs = 60000, signal } = {}) {
+export async function sendQuery(message, history = [], { onToken, onDone, timeoutMs = 60000, signal } = {}) {
   const ctrl = new AbortController()
   let timer = setTimeout(() => ctrl.abort(), timeoutMs)
   const resetTimer = () => {
@@ -39,7 +39,7 @@ export async function sendQuery(message, { onToken, onDone, timeoutMs = 60000, s
     const res = await fetch(`${API_BASE}/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ message, history }),
       signal: ctrl.signal,
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)

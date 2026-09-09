@@ -155,6 +155,7 @@ export default function App() {
   const [response, setResponse] = useState(null)
   const [queryMapData, setQueryMapData] = useState(null)
   const [selectedZone, setSelectedZone] = useState(null)
+  const [chatHistory, setChatHistory] = useState([])
   const investigation = useInvestigation()
 
   /* ── UI shell state ── */
@@ -221,8 +222,13 @@ export default function App() {
 
       const full = LANG_FULL[lang] || 'english'
       try {
-        const data = await sendQuery(q)
+        const data = await sendQuery(q, chatHistory)
         setResponse(data)
+        setChatHistory(prev => [
+          ...prev,
+          { role: 'user', content: q },
+          { role: 'assistant', content: data?.text || '' }
+        ])
         const md = data?.map_data || null
         setQueryMapData(md)
         const c = overlayCenter(md)
@@ -236,7 +242,7 @@ export default function App() {
         setQLoading(false)
       }
     },
-    [isMobile, lang, investigation],
+    [isMobile, lang, investigation, chatHistory],
   )
 
   const lastQueryRef = useRef('')
@@ -402,6 +408,7 @@ export default function App() {
           alertCount={alerts.length}
           onBell={() => handleNav('alerts')}
           onSearch={(v) => handleSubmit(`Ocean conditions and safety near ${v}`)}
+          onSos={() => handleSubmit('I am in an emergency and need immediate SOS help at my location.')}
           homePort={conditions?.location}
           systemStatus={systemStatus}
         />
@@ -543,6 +550,7 @@ export default function App() {
         onNav={handleNav}
         alertCount={alerts.length}
         t={t}
+        onSos={() => handleSubmit('I am in an emergency and need immediate SOS help at my location.')}
       />
 
       <BottomSheet

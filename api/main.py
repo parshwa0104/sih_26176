@@ -32,10 +32,11 @@ def read_root():
 
 class QueryRequest(BaseModel):
     message: str
+    history: List[Dict[str, str]] = []
 
-def _sse_stream(query: str):
+def _sse_stream(query: str, history: list):
     try:
-        for event in process_query_stream(query):
+        for event in process_query_stream(query, history):
             yield f"data: {json.dumps(event)}\n\n"
         yield "data: [DONE]\n\n"
     except Exception as e:
@@ -53,7 +54,7 @@ def _sse_stream(query: str):
 @app.post("/query")
 def process_query_endpoint(request: QueryRequest):
     return StreamingResponse(
-        _sse_stream(request.message),
+        _sse_stream(request.message, request.history),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )

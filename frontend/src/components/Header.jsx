@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, Search, User, MapPin } from 'lucide-react'
+import { Bell, Search, User, MapPin, PhoneCall } from 'lucide-react'
 import BrandMark from './BrandMark'
 import LanguageMenu from './LanguageMenu'
 import StatusDot from './StatusDot'
@@ -13,6 +13,7 @@ export default function Header({
   alertCount = 0,
   onBell,
   onSearch,
+  onSos,
   homePort,
   systemStatus = 'connecting',
 }) {
@@ -46,6 +47,15 @@ export default function Header({
       </form>
 
       <div className="ml-auto flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onSos}
+          className="mr-1 flex h-9 items-center gap-1.5 rounded-xl bg-status-danger px-3 font-semibold text-white shadow-sm transition-all hover:bg-red-600 active:scale-95"
+        >
+          <PhoneCall size={16} className="animate-pulse" />
+          <span>SOS</span>
+        </button>
+
         <div className="hidden items-center gap-field rounded-xl border border-hairline bg-surface-1/50 px-2.5 py-1.5 font-mono text-meta uppercase text-ink-dim md:flex">
           <StatusDot status={systemStatus} />
           <span>{systemStatus === 'live' ? t.systemLive : systemStatus === 'offline' ? t.systemOffline : t.systemConnecting}</span>
