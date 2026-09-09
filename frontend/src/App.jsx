@@ -451,7 +451,7 @@ export default function App() {
               t={t}
             />
 
-            {qLoading && (
+            {qLoading && investigation.phase !== 'synthesis' && (
               <div className="absolute inset-0 z-[400] flex items-center justify-center bg-ocean-900/60 backdrop-blur-sm pb-[140px] lg:pb-0">
                 <div className="relative w-[92vw] max-w-[520px] aspect-[4/3] sm:aspect-auto sm:h-[400px] rounded-2xl border border-hairline-strong bg-ocean-850/95 shadow-2xl overflow-hidden">
                   <InvestigationView investigation={investigation} />
