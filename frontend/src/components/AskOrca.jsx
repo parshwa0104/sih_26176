@@ -27,7 +27,7 @@ const AskOrca = forwardRef(function AskOrca({ onSubmit, loading, lang, t, classN
     <form
       onSubmit={submit}
       className={cx(
-        'rounded-2xl border border-hairline-strong bg-ocean-850/95 p-2 shadow-inst backdrop-blur',
+        'rounded-xl border border-hairline-strong bg-ocean-850/95 p-2 shadow-inst backdrop-blur',
         className,
       )}
     >
@@ -85,7 +85,7 @@ const AskOrca = forwardRef(function AskOrca({ onSubmit, loading, lang, t, classN
       </div>
       <p
         className={cx(
-          'mt-1 truncate px-2 font-mono text-meta uppercase text-ink-dim/70',
+          'mt-1 truncate px-2 font-mono text-meta text-ink-dim/70',
           !listening && 'hidden sm:block [@media(max-height:480px)]:hidden',
         )}
       >

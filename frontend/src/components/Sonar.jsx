@@ -33,10 +33,7 @@ export default function Sonar({ size = 96, active = true, label, className = '' 
         />
       )}
       {active && <span className="absolute h-2.5 w-2.5 rounded-full bg-accent animate-orca-ping" />}
-      <span
-        className="relative h-1.5 w-1.5 rounded-full bg-accent-bright"
-        style={{ boxShadow: `0 0 10px 2px ${ACCENT}99` }}
-      />
+      <span className="relative h-1.5 w-1.5 rounded-full bg-accent-bright" />
     </div>
   )
 }

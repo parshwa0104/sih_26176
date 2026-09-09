@@ -32,7 +32,7 @@ export default function PfzLayer({ zones = [], onZoneTap }) {
           <Tooltip direction="top" offset={[0, -6]} opacity={1}>
             <span className="font-mono text-meta">
               {z.label}
-              {z.species ? ` · ${z.species}` : ''}
+              {z.species ? `, ${z.species}` : ''}
             </span>
           </Tooltip>
         </Marker>

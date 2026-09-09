@@ -28,7 +28,7 @@ export default function AlertsPanel({
     >
       {!hideHeader && (
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-label uppercase text-ink">{t.alertsTitle}</h2>
+          <h2 className="font-display text-caption font-semibold text-ink">{t.alertsTitle}</h2>
           {alerts.length > 0 && (
             <span className="rounded-full bg-status-danger/15 px-2 py-0.5 text-meta font-bold text-status-danger">
               {alerts.length}
@@ -53,7 +53,7 @@ export default function AlertsPanel({
               <li
                 key={i}
                 className={cx(
-                  'rounded-r-lg border border-l-2 border-hairline bg-surface-1/40 p-stack',
+                  'rounded-r-xl border border-l-2 border-hairline bg-surface-1/40 p-stack',
                   k.bar,
                 )}
               >
@@ -62,7 +62,7 @@ export default function AlertsPanel({
                   <div className="min-w-0">
                     <p className="text-body font-medium leading-snug text-ink">{a.text}</p>
                     {a.time && (
-                      <p className="mt-1 flex items-center gap-1 font-mono text-meta uppercase text-ink-dim">
+                      <p className="mt-1 flex items-center gap-1 font-mono text-meta text-ink-dim">
                         <Clock size={9} />
                         {a.time}
                       </p>

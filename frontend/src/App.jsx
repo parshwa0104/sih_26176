@@ -416,12 +416,12 @@ export default function App() {
             className="flex items-center gap-3 border-b border-status-danger/30 bg-status-danger/10 px-4 py-2 text-body lg:px-6"
           >
             <WifiOff size={16} className="shrink-0 text-status-danger" />
-            <span className="font-semibold text-ink">{t.backendDown}</span>
-            <span className="hidden text-ink-dim sm:inline">— {t.backendDownMsg}</span>
+            <span className="font-semibold text-ink">{t.backendDown}.</span>
+            <span className="hidden text-ink-dim sm:inline">{t.backendDownMsg}</span>
             <button
               type="button"
               onClick={loadData}
-              className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1 text-label text-accent transition-colors hover:bg-black/5"
+              className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-hairline px-2.5 py-1 text-label text-accent transition-colors hover:bg-black/5"
             >
               <RefreshCw size={12} />
               {t.retry}
@@ -465,7 +465,7 @@ export default function App() {
             </div>
 
             {/* Coordinate readout */}
-            <div className="absolute bottom-3 right-3 z-[500] hidden rounded-lg border border-hairline bg-ocean-850/90 px-2.5 py-1.5 font-mono text-meta uppercase text-ink-dim backdrop-blur sm:block">
+            <div className="absolute bottom-3 right-3 z-[500] hidden rounded-xl border border-hairline bg-ocean-850/90 px-2.5 py-1.5 font-mono text-meta text-ink-dim backdrop-blur sm:block">
               <div className="text-ink">{fmtReadout(readout)}</div>
             </div>
 
@@ -473,13 +473,13 @@ export default function App() {
                 the bottom nav (bar height + safe-area inset). */}
             <div className="absolute inset-x-2 bottom-[calc(72px+env(safe-area-inset-bottom,0px))] z-[600] flex flex-col gap-2 sm:inset-x-3 lg:inset-x-auto lg:bottom-6 lg:left-6 lg:w-[min(640px,52vw)]">
               {drawerActive && !qLoading && drawerContent && (
-                <div className="hidden max-h-[46vh] animate-fade-up overflow-y-auto rounded-2xl border border-hairline-strong bg-ocean-850/95 p-block shadow-inst backdrop-blur lg:block">
+                <div className="hidden max-h-[46vh] animate-fade-up overflow-y-auto rounded-xl border border-hairline-strong bg-ocean-850/95 p-block shadow-inst backdrop-blur lg:block">
                   <div className="mb-2 flex justify-end">
                     <button
                       type="button"
                       onClick={clearDrawer}
                       disabled={qLoading}
-                      className="rounded-md px-2 py-0.5 text-label uppercase text-ink-dim hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+                      className="rounded-xl px-2 py-0.5 text-label text-ink-dim hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {t.clear}
                     </button>

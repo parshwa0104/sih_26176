@@ -17,7 +17,7 @@ function BarButton({ item, active, alertCount, t, onNav }) {
       aria-current={item.kind === 'view' && active ? 'page' : undefined}
       aria-pressed={item.kind === 'toggle' ? active : undefined}
       className={cx(
-        'relative flex flex-1 flex-col items-center gap-0.5 rounded-lg px-2 py-1.5 text-label transition-colors',
+        'relative flex flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-label transition-colors',
         active ? 'text-accent' : 'text-ink-dim',
       )}
     >
@@ -58,7 +58,7 @@ export default function MobileNav({ navState, onNav, alertCount = 0, t }) {
           aria-haspopup="menu"
           aria-expanded={moreActive}
           className={cx(
-            'flex flex-1 flex-col items-center gap-0.5 rounded-lg px-2 py-1.5 text-label transition-colors',
+            'flex flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-label transition-colors',
             moreActive ? 'text-accent' : 'text-ink-dim',
           )}
         >

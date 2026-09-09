@@ -10,13 +10,13 @@ export default function MapCard({ accent = 'var(--accent)', icon: Icon, title, t
       <div className="flex items-center gap-2">
         {Icon && (
           <span
-            className="grid h-5 w-5 shrink-0 place-items-center rounded-md"
+            className="grid h-5 w-5 shrink-0 place-items-center rounded-xl"
             style={{ background: wash, color: accent }}
           >
             <Icon size={12} />
           </span>
         )}
-        <span className="min-w-0 flex-1 truncate font-display text-label uppercase text-ink">
+        <span className="min-w-0 flex-1 truncate font-display text-caption font-semibold text-ink">
           {title}
         </span>
         {tag && (

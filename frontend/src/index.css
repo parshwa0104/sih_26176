@@ -17,7 +17,6 @@
   --accent: #0B6472;
   --accent-bright: #0E7E8A;
   --accent-deep: #08414A;
-  --marine: #0C6B5A;
   --safe: #0C7A5A;
   --caution: #96610F;
   --danger: #B0271C;
@@ -103,6 +102,7 @@ body {
   box-shadow: 0 10px 30px rgba(8, 26, 24, 0.16);
 }
 .leaflet-popup-content-wrapper { border-radius: 12px; }
+/* Radius system: 12px surfaces, full pills, 2px micro-swatches. */
 .leaflet-popup-content { margin: 0; font-size: 12px; line-height: 1.45; }
 .leaflet-popup-content p { margin: 0; }
 .leaflet-container a.leaflet-popup-close-button {
@@ -118,7 +118,7 @@ body {
   border: 1px solid var(--hairline-strong);
   color: var(--ink);
   box-shadow: 0 6px 18px rgba(8, 26, 24, 0.14);
-  border-radius: 7px;
+  border-radius: 12px;
   font-size: 11px;
   padding: 3px 7px;
   font-weight: 500;

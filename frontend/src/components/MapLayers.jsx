@@ -14,7 +14,7 @@ function PfzSwatch() {
 }
 function SeaSwatch() {
   return (
-    <span className="flex h-3.5 w-3.5 shrink-0 overflow-hidden rounded-[3px] border border-hairline">
+    <span className="flex h-3.5 w-3.5 shrink-0 overflow-hidden rounded-sm border border-hairline">
       <span className="flex-1" style={{ background: `${CHART.route}5c` }} />
       <span className="flex-1" style={{ background: `${SIGNAL.caution}5c` }} />
       <span className="flex-1" style={{ background: `${SIGNAL.danger}5c` }} />
@@ -24,7 +24,7 @@ function SeaSwatch() {
 function DiamondSwatch({ color }) {
   return (
     <span className="grid h-3.5 w-3.5 shrink-0 place-items-center">
-      <span className="h-2.5 w-2.5 rotate-45 rounded-[2px]" style={{ background: color }} />
+      <span className="h-2.5 w-2.5 rotate-45 rounded-sm" style={{ background: color }} />
     </span>
   )
 }
@@ -48,7 +48,7 @@ function Toggle({ active, onClick, swatch, label }) {
       onClick={onClick}
       aria-pressed={active}
       className={cx(
-        'flex min-h-[36px] w-full items-center gap-2 rounded-lg px-2 py-1.5 text-label transition-colors',
+        'flex min-h-[36px] w-full items-center gap-2 rounded-xl px-2 py-1.5 text-label transition-colors',
         active ? 'text-ink' : 'text-ink-mute hover:text-ink-dim',
       )}
     >
@@ -89,12 +89,12 @@ export default function MapLayers({
 
   return (
     <div className="w-[164px] rounded-xl border border-hairline bg-ocean-850/92 p-1.5 shadow-inst backdrop-blur lg:w-[186px]">
-      <div className="px-2 pb-1 pt-0.5 font-mono text-meta uppercase text-ink-mute">{t.layers}</div>
+      <div className="px-2 pb-1 pt-0.5 font-mono text-meta text-ink-mute">{t.layers}</div>
 
       <Toggle active={showPfz} onClick={onTogglePfz} swatch={<PfzSwatch />} label={t.layerPfz} />
       <Toggle active={showSeaState} onClick={onToggleSeaState} swatch={<SeaSwatch />} label={t.layerSea} />
       {showSeaState && (
-        <div className="hidden justify-between px-2 pb-1 pt-0.5 font-mono text-[9px] uppercase tracking-wide text-ink-mute lg:flex">
+        <div className="hidden justify-between px-2 pb-1 pt-0.5 font-mono text-[9px] text-ink-mute lg:flex">
           <span>{t.seaCalm}</span>
           <span>{t.seaModerate}</span>
           <span>{t.seaRough}</span>

@@ -82,7 +82,7 @@ export const UI_STRINGS = {
 
     // Ask ORCA
     askTitle: 'Ask ORCA',
-    askHint: 'Fish · safety · routes · ocean conditions — in your language',
+    askHint: 'Fish, safety, routes, ocean conditions (in your language)',
     send: 'Send', listening: 'Listening…',
     voiceUnsupported: 'Voice input is not supported on this device',
 
@@ -101,9 +101,9 @@ export const UI_STRINGS = {
     queryFailed: 'ORCA could not process that',
     queryTimeout: 'ORCA is taking too long',
     queryFailedMsg:
-      'The request failed. The AI pipeline or Ollama service may be unavailable — try again.',
+      'The request failed. The AI pipeline or Ollama service may be unavailable; try again.',
     queryTimeoutMsg:
-      'The AI pipeline did not respond in time. It may be busy — try again in a moment.',
+      'The AI pipeline did not respond in time. It may be busy; try again in a moment.',
     retry: 'Retry',
     emptyResponse: 'Ask ORCA a question or tap a zone on the map to begin.',
 
@@ -168,7 +168,7 @@ export const UI_STRINGS = {
     legendDanger: 'खतरा',
 
     askTitle: 'ORCA से पूछें',
-    askHint: 'मछली · सुरक्षा · मार्ग · महासागर स्थितियाँ — अपनी भाषा में',
+    askHint: 'मछली, सुरक्षा, मार्ग, महासागर स्थितियाँ (अपनी भाषा में)',
     send: 'भेजें', listening: 'सुन रहा है…',
     voiceUnsupported: 'इस डिवाइस पर वॉइस इनपुट समर्थित नहीं है',
 
@@ -184,7 +184,7 @@ export const UI_STRINGS = {
       'ORCA सेवा तक नहीं पहुँच सके। सुनिश्चित करें कि बैकएंड पोर्ट 8000 पर चल रहा है।',
     queryFailed: 'ORCA इसे संसाधित नहीं कर सका',
     queryTimeout: 'ORCA को बहुत समय लग रहा है',
-    queryFailedMsg: 'अनुरोध विफल रहा। AI पाइपलाइन या Ollama अनुपलब्ध हो सकता है — पुनः प्रयास करें।',
+    queryFailedMsg: 'अनुरोध विफल रहा। AI पाइपलाइन या Ollama अनुपलब्ध हो सकता है; पुनः प्रयास करें।',
     queryTimeoutMsg: 'AI पाइपलाइन ने समय पर उत्तर नहीं दिया। पुनः प्रयास करें।',
     retry: 'पुनः प्रयास',
     emptyResponse: 'शुरू करने के लिए ORCA से पूछें या नक्शे पर क्षेत्र टैप करें।',
@@ -246,7 +246,7 @@ export const UI_STRINGS = {
     legendDanger: 'धोका',
 
     askTitle: 'ORCA ला विचारा',
-    askHint: 'मासे · सुरक्षा · मार्ग · महासागर स्थिती — तुमच्या भाषेत',
+    askHint: 'मासे, सुरक्षा, मार्ग, महासागर स्थिती (तुमच्या भाषेत)',
     send: 'पाठवा', listening: 'ऐकत आहे…',
     voiceUnsupported: 'या डिव्हाइसवर व्हॉइस इनपुट समर्थित नाही',
 
@@ -261,7 +261,7 @@ export const UI_STRINGS = {
     backendDownMsg: 'ORCA सेवेपर्यंत पोहोचता आले नाही. बॅकएंड पोर्ट 8000 वर सुरू असल्याची खात्री करा.',
     queryFailed: 'ORCA यावर प्रक्रिया करू शकले नाही',
     queryTimeout: 'ORCA ला खूप वेळ लागत आहे',
-    queryFailedMsg: 'विनंती अयशस्वी. AI पाइपलाइन किंवा Ollama अनुपलब्ध असू शकते — पुन्हा प्रयत्न करा.',
+    queryFailedMsg: 'विनंती अयशस्वी. AI पाइपलाइन किंवा Ollama अनुपलब्ध असू शकते; पुन्हा प्रयत्न करा.',
     queryTimeoutMsg: 'AI पाइपलाइनने वेळेत उत्तर दिले नाही. पुन्हा प्रयत्न करा.',
     retry: 'पुन्हा प्रयत्न',
     emptyResponse: 'सुरू करण्यासाठी ORCA ला विचारा किंवा नकाशावर क्षेत्र टॅप करा.',
@@ -323,7 +323,7 @@ export const UI_STRINGS = {
     legendDanger: 'ஆபத்து',
 
     askTitle: 'ORCA-விடம் கேள்',
-    askHint: 'மீன் · பாதுகாப்பு · வழிகள் · கடல் நிலைமைகள் — உங்கள் மொழியில்',
+    askHint: 'மீன், பாதுகாப்பு, வழிகள், கடல் நிலைமைகள் (உங்கள் மொழியில்)',
     send: 'அனுப்பு', listening: 'கேட்கிறது…',
     voiceUnsupported: 'இந்த சாதனத்தில் குரல் உள்ளீடு ஆதரிக்கப்படவில்லை',
 
@@ -339,7 +339,7 @@ export const UI_STRINGS = {
       'ORCA சேவையை அணுக முடியவில்லை. பின்தளம் போர்ட் 8000 இல் இயங்குகிறதா என சரிபார்க்கவும்.',
     queryFailed: 'ORCA அதைச் செயலாக்க முடியவில்லை',
     queryTimeout: 'ORCA அதிக நேரம் எடுக்கிறது',
-    queryFailedMsg: 'கோரிக்கை தோல்வி. AI பைப்லைன் அல்லது Ollama கிடைக்கவில்லை — மீண்டும் முயற்சி செய்.',
+    queryFailedMsg: 'கோரிக்கை தோல்வி. AI பைப்லைன் அல்லது Ollama கிடைக்கவில்லை; மீண்டும் முயற்சி செய்.',
     queryTimeoutMsg: 'AI பைப்லைன் சரியான நேரத்தில் பதிலளிக்கவில்லை. மீண்டும் முயற்சி செய்.',
     retry: 'மீண்டும் முயற்சி',
     emptyResponse: 'தொடங்க ORCA-விடம் கேள் அல்லது வரைபடத்தில் ஒரு பகுதியைத் தட்டு.',
@@ -401,7 +401,7 @@ export const UI_STRINGS = {
     legendDanger: 'അപകടം',
 
     askTitle: 'ORCA യോട് ചോദിക്കൂ',
-    askHint: 'മീൻ · സുരക്ഷ · വഴികൾ · സമുദ്ര സാഹചര്യങ്ങൾ — നിങ്ങളുടെ ഭാഷയിൽ',
+    askHint: 'മീൻ, സുരക്ഷ, വഴികൾ, സമുദ്ര സാഹചര്യങ്ങൾ (നിങ്ങളുടെ ഭാഷയിൽ)',
     send: 'അയയ്ക്കുക', listening: 'കേൾക്കുന്നു…',
     voiceUnsupported: 'ഈ ഉപകരണത്തിൽ വോയ്‌സ് ഇൻപുട്ട് പിന്തുണയ്ക്കുന്നില്ല',
 
@@ -417,7 +417,7 @@ export const UI_STRINGS = {
       'ORCA സേവനത്തിലേക്ക് എത്താനായില്ല. ബാക്കെൻഡ് പോർട്ട് 8000-ൽ പ്രവർത്തിക്കുന്നുവെന്ന് ഉറപ്പാക്കുക.',
     queryFailed: 'ORCA ന് അത് പ്രോസസ്സ് ചെയ്യാനായില്ല',
     queryTimeout: 'ORCA വളരെ സമയമെടുക്കുന്നു',
-    queryFailedMsg: 'അഭ്യർത്ഥന പരാജയപ്പെട്ടു. AI പൈപ്പ്‌ലൈൻ അല്ലെങ്കിൽ Ollama ലഭ്യമല്ല — വീണ്ടും ശ്രമിക്കുക.',
+    queryFailedMsg: 'അഭ്യർത്ഥന പരാജയപ്പെട്ടു. AI പൈപ്പ്‌ലൈൻ അല്ലെങ്കിൽ Ollama ലഭ്യമല്ല; വീണ്ടും ശ്രമിക്കുക.',
     queryTimeoutMsg: 'AI പൈപ്പ്‌ലൈൻ സമയത്ത് പ്രതികരിച്ചില്ല. വീണ്ടും ശ്രമിക്കുക.',
     retry: 'വീണ്ടും ശ്രമിക്കുക',
     emptyResponse: 'തുടങ്ങാൻ ORCA യോട് ചോദിക്കൂ അല്ലെങ്കിൽ മാപ്പിൽ ഒരു മേഖല ടാപ്പ് ചെയ്യുക.',
@@ -479,7 +479,7 @@ export const UI_STRINGS = {
     legendDanger: 'ప్రమాదం',
 
     askTitle: 'ORCA ను అడగండి',
-    askHint: 'చేప · భద్రత · మార్గాలు · సముద్ర పరిస్థితులు — మీ భాషలో',
+    askHint: 'చేప, భద్రత, మార్గాలు, సముద్ర పరిస్థితులు (మీ భాషలో)',
     send: 'పంపండి', listening: 'వింటోంది…',
     voiceUnsupported: 'ఈ పరికరంలో వాయిస్ ఇన్‌పుట్ మద్దతు లేదు',
 
@@ -495,7 +495,7 @@ export const UI_STRINGS = {
       'ORCA సేవను చేరుకోలేకపోయాము. బ్యాకెండ్ పోర్ట్ 8000లో నడుస్తోందని నిర్ధారించుకోండి.',
     queryFailed: 'ORCA దాన్ని ప్రాసెస్ చేయలేకపోయింది',
     queryTimeout: 'ORCA చాలా సమయం తీసుకుంటోంది',
-    queryFailedMsg: 'అభ్యర్థన విఫలమైంది. AI పైప్‌లైన్ లేదా Ollama అందుబాటులో లేదు — మళ్ళీ ప్రయత్నించండి.',
+    queryFailedMsg: 'అభ్యర్థన విఫలమైంది. AI పైప్‌లైన్ లేదా Ollama అందుబాటులో లేదు; మళ్ళీ ప్రయత్నించండి.',
     queryTimeoutMsg: 'AI పైప్‌లైన్ సకాలంలో స్పందించలేదు. మళ్ళీ ప్రయత్నించండి.',
     retry: 'మళ్ళీ ప్రయత్నించండి',
     emptyResponse: 'ప్రారంభించడానికి ORCA ను అడగండి లేదా మ్యాప్‌పై ఒక జోన్‌ను నొక్కండి.',
@@ -557,7 +557,7 @@ export const UI_STRINGS = {
     legendDanger: 'বিপদ',
 
     askTitle: 'ORCA কে জিজ্ঞাসা করুন',
-    askHint: 'মাছ · নিরাপত্তা · পথ · সমুদ্র পরিস্থিতি — আপনার ভাষায়',
+    askHint: 'মাছ, নিরাপত্তা, পথ, সমুদ্র পরিস্থিতি (আপনার ভাষায়)',
     send: 'পাঠান', listening: 'শুনছে…',
     voiceUnsupported: 'এই ডিভাইসে ভয়েস ইনপুট সমর্থিত নয়',
 
@@ -573,7 +573,7 @@ export const UI_STRINGS = {
       'ORCA পরিষেবায় পৌঁছানো যায়নি। নিশ্চিত করুন ব্যাকএন্ড পোর্ট 8000-এ চলছে।',
     queryFailed: 'ORCA এটি প্রক্রিয়া করতে পারেনি',
     queryTimeout: 'ORCA খুব বেশি সময় নিচ্ছে',
-    queryFailedMsg: 'অনুরোধ ব্যর্থ হয়েছে। AI পাইপলাইন বা Ollama অনুপলব্ধ হতে পারে — আবার চেষ্টা করুন।',
+    queryFailedMsg: 'অনুরোধ ব্যর্থ হয়েছে। AI পাইপলাইন বা Ollama অনুপলব্ধ হতে পারে; আবার চেষ্টা করুন।',
     queryTimeoutMsg: 'AI পাইপলাইন সময়মতো সাড়া দেয়নি। আবার চেষ্টা করুন।',
     retry: 'আবার চেষ্টা',
     emptyResponse: 'শুরু করতে ORCA কে জিজ্ঞাসা করুন বা মানচিত্রে একটি জোন ট্যাপ করুন।',

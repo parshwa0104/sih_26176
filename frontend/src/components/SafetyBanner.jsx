@@ -62,7 +62,7 @@ export default function SafetyBanner({ status, locationLabel, advisory, updated,
       <span
         aria-hidden="true"
         className="absolute inset-y-0 left-0 w-[3px]"
-        style={{ background: c.color, boxShadow: `0 0 14px ${c.color}` }}
+        style={{ background: c.color }}
       />
 
       {/* Status light */}
@@ -102,7 +102,7 @@ export default function SafetyBanner({ status, locationLabel, advisory, updated,
       </div>
 
       {updated && (
-        <div className="ml-auto hidden shrink-0 text-right font-mono text-meta uppercase text-ink-dim md:block [@media(max-height:480px)]:hidden">
+        <div className="ml-auto hidden shrink-0 text-right font-mono text-meta text-ink-dim md:block [@media(max-height:480px)]:hidden">
           <span className="block">{t.lastUpdate}</span>
           <span className="text-ink">{updated}</span>
         </div>

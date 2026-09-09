@@ -9,7 +9,7 @@ export default function BrandMark({ descriptor, compact = false, className = '' 
       <div className="leading-none">
         <div className="font-display text-heading font-bold tracking-[0.18em] text-ink">ORCA</div>
         {!compact && descriptor && (
-          <div className="mt-1 font-mono text-meta uppercase text-ink-dim">{descriptor}</div>
+          <div className="mt-1 font-mono text-meta text-ink-dim">{descriptor}</div>
         )}
       </div>
     </div>

@@ -41,7 +41,7 @@ export function deriveInsights({ conditions, pfzZones = [], safetyStatus, t }) {
       id: 'pfz',
       severity: 'safe',
       title: t.insightPfzTitle,
-      detail: [best.label, best.species, best.description].filter(Boolean).join(' · '),
+      detail: [best.label, best.species, best.description].filter(Boolean).join(', '),
       action: { type: 'map', center: [best.lat, best.lng], zoom: 9 },
     })
   }
@@ -57,7 +57,7 @@ export function deriveInsights({ conditions, pfzZones = [], safetyStatus, t }) {
       id: 'cond',
       severity: 'safe',
       title: t.insightSafeTitle,
-      detail: `SST ${conditions.sst ?? '—'} · Chl-a ${conditions.chlorophyll ?? '—'}`,
+      detail: `SST ${conditions.sst ?? '-'}, Chl-a ${conditions.chlorophyll ?? '-'}`,
       action:
         loc && typeof loc.lat === 'number' && typeof loc.lng === 'number'
           ? { type: 'map', center: [loc.lat, loc.lng], zoom: 9 }
@@ -72,7 +72,7 @@ export function deriveInsights({ conditions, pfzZones = [], safetyStatus, t }) {
       id: 'wind',
       severity: wind >= 30 ? 'danger' : 'caution',
       title: t.insightRiskTitle,
-      detail: `Wind ${conditions.wind_speed} · Waves ${conditions.wave_height}`,
+      detail: `Wind ${conditions.wind_speed}, Waves ${conditions.wave_height}`,
       action: { type: 'ask', query: 'What are the sea conditions right now?' },
     })
   }
@@ -84,7 +84,7 @@ export function deriveInsights({ conditions, pfzZones = [], safetyStatus, t }) {
       id: 'alert',
       severity: alert.type === 'warning' ? 'caution' : 'accent',
       title: t.insightAlertTitle,
-      detail: [alert.text, alert.time].filter(Boolean).join(' · '),
+      detail: [alert.text, alert.time].filter(Boolean).join(', '),
       action: null,
     })
   }

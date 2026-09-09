@@ -22,30 +22,30 @@ export default function ReportPanel({ conditions, pfzZones = [], safetyStatus, t
 
   const rows = [
     [t.reportGenerated, generated],
-    [t.reportSafety, `${safetyWord}${conditions?.location ? ` · ${conditions.location}` : ''}`],
+    [t.reportSafety, `${safetyWord}${conditions?.location ? `, ${conditions.location}` : ''}`],
     [
       t.reportTopZone,
       topZone
-        ? `${topZone.label} — ${topZone.species || ''} (${topZone.confidence || '—'})`
-        : '—',
+        ? `${topZone.label}, ${topZone.species || '-'} (${topZone.confidence || '-'})`
+        : '-',
     ],
     [
       t.reportConditions,
       conditions
-        ? `SST ${conditions.sst} · ${t.wind} ${conditions.wind_speed} · ${t.waves} ${conditions.wave_height} · ${t.chla} ${conditions.chlorophyll}`
-        : '—',
+        ? `SST ${conditions.sst}, ${t.wind} ${conditions.wind_speed}, ${t.waves} ${conditions.wave_height}, ${t.chla} ${conditions.chlorophyll}`
+        : '-',
     ],
     [t.reportAlerts, conditions?.alerts?.length ? String(conditions.alerts.length) : '0'],
   ]
 
   const copy = async () => {
-    const text = [`ORCA — ${t.reportTitle}`, ...rows.map(([k, v]) => `${k}: ${v}`)].join('\n')
+    const text = [`ORCA ${t.reportTitle}`, ...rows.map(([k, v]) => `${k}: ${v}`)].join('\n')
     try {
       await navigator.clipboard.writeText(text)
       setCopied(true)
       setTimeout(() => setCopied(false), 1800)
     } catch {
-      /* clipboard blocked — no-op */
+      /* clipboard blocked, no-op */
     }
   }
 
@@ -54,7 +54,7 @@ export default function ReportPanel({ conditions, pfzZones = [], safetyStatus, t
       <dl className="divide-y divide-hairline">
         {rows.map(([k, v]) => (
           <div key={k} className="grid grid-cols-[92px_1fr] gap-3 py-2.5 sm:grid-cols-[110px_1fr]">
-            <dt className="font-mono text-meta uppercase text-ink-dim">{k}</dt>
+            <dt className="font-mono text-meta text-ink-dim">{k}</dt>
             <dd className="text-body text-ink">{v}</dd>
           </div>
         ))}
@@ -73,7 +73,7 @@ export default function ReportPanel({ conditions, pfzZones = [], safetyStatus, t
       <button
         type="button"
         onClick={copy}
-        className="mt-4 inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-hairline px-3.5 py-2 text-label text-accent transition-colors hover:bg-black/5"
+        className="mt-4 inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border border-hairline px-3.5 py-2 text-label text-accent transition-colors hover:bg-black/5"
       >
         {copied ? <Check size={13} /> : <Copy size={13} />}
         {copied ? t.copied : t.copyBrief}

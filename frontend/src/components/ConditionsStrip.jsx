@@ -20,7 +20,7 @@ function Cell({ icon: Icon, label, value, meter }) {
         <Icon size={10} className="mt-px shrink-0 text-accent" />
         <span className="min-w-0">{label}</span>
       </div>
-      <div className="mt-1.5 truncate font-mono text-body font-semibold text-ink">{value ?? '—'}</div>
+      <div className="mt-1.5 truncate font-mono text-body font-semibold text-ink">{value ?? '-'}</div>
       <div className="mt-1.5 h-[3px] w-full overflow-hidden rounded-full bg-ink/[0.08]">
         {pct != null && (
           <div
@@ -59,7 +59,7 @@ export default function ConditionsStrip({
   if (!conditions) {
     return (
       <section className={cx('border-b border-hairline p-block', className)}>
-        <h2 className="font-display text-label uppercase text-ink-dim">{t.conditionsTitle}</h2>
+        <h2 className="font-display text-caption font-semibold text-ink-dim">{t.conditionsTitle}</h2>
         <p className="mt-3 text-body text-ink-dim">{t.backendDown}</p>
       </section>
     )
@@ -73,9 +73,9 @@ export default function ConditionsStrip({
     <section className={cx('border-b border-hairline p-block', className)} aria-label={t.conditionsTitle}>
       {!hideHeader && (
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-label uppercase text-ink">{t.conditionsTitle}</h2>
+          <h2 className="font-display text-caption font-semibold text-ink">{t.conditionsTitle}</h2>
           {conditions.location && (
-            <span className="flex items-center gap-1 font-mono text-meta uppercase text-ink-dim">
+            <span className="flex items-center gap-1 font-mono text-meta text-ink-dim">
               {conditions.location}
             </span>
           )}
@@ -92,10 +92,7 @@ export default function ConditionsStrip({
           <span className="font-mono text-readout-xl text-ink">{conditions.sst}</span>
           {conditions.sst_range && (
             <span
-              className={cx(
-                'mb-1.5 text-meta uppercase',
-                isOptimal ? 'text-status-safe' : 'text-ink-dim',
-              )}
+              className={cx('mb-1.5 text-meta', isOptimal ? 'text-status-safe' : 'text-ink-dim')}
             >
               {conditions.sst_range}
             </span>
@@ -124,16 +121,16 @@ export default function ConditionsStrip({
       {conditions.craft_advisory && (
         <p
           className={cx(
-            'mt-3 rounded-lg border border-hairline bg-surface-1/40 px-2.5 py-2 text-caption',
+            'mt-3 rounded-xl border border-hairline bg-surface-1/40 px-2.5 py-2 text-caption',
             STATUS_TEXT[safetyStatus] || 'text-ink',
           )}
         >
           {conditions.craft_advisory}
         </p>
       )}
-      <p className="mt-2 font-mono text-meta uppercase text-ink-dim">
+      <p className="mt-2 font-mono text-meta text-ink-dim">
         {conditions.source ? `${t.source}: ${conditions.source}` : ''}
-        {conditions.updated ? ` · ${t.asOf} ${conditions.updated}` : ''}
+        {conditions.updated ? `, ${t.asOf} ${conditions.updated}` : ''}
       </p>
     </section>
   )

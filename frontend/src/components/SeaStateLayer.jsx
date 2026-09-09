@@ -35,8 +35,8 @@ export default function SeaStateLayer({ grid = [] }) {
           <Tooltip direction="center" opacity={1}>
             <span className="font-mono text-meta">
               {c.label}
-              {isNum(c.sst) ? ` · SST ${c.sst}°` : ''}
-              {isNum(c.wave) ? ` · ${c.wave} m` : ''}
+              {isNum(c.sst) ? `, SST ${c.sst}°` : ''}
+              {isNum(c.wave) ? `, ${c.wave} m` : ''}
             </span>
           </Tooltip>
         </Rectangle>

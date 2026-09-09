@@ -45,7 +45,6 @@ export default {
         ocean: { 900: '#EEF2F1', 850: '#FBFCFB', 800: '#DFE6E4' },
         surface: { 1: '#FFFFFF', 2: '#F4F7F6', 3: '#EAEFED' },
         accent: { DEFAULT: '#0B6472', bright: '#0E7E8A', deep: '#08414A' },
-        marine: { DEFAULT: '#0C6B5A', deep: '#0A5548' },
         status: {
           safe: '#0C7A5A',
           caution: '#96610F',
@@ -69,7 +68,6 @@ export default {
       },
       boxShadow: {
         inst: '0 16px 44px -14px rgba(8, 26, 24, 0.20)',
-        glow: '0 0 18px rgba(11, 100, 114, 0.28)',
       },
       // ── Motion ────────────────────────────────────────────────
       // One easing character: a firm decelerate for things entering or

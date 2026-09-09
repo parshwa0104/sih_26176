@@ -13,7 +13,7 @@ export default function ReasoningTrail({ steps = [], t }) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between px-3 py-2 text-label uppercase text-accent"
+        className="flex w-full items-center justify-between px-3 py-2 text-label text-accent"
       >
         <span className="flex items-center gap-field">
           <Cpu size={13} />
@@ -45,7 +45,7 @@ export default function ReasoningTrail({ steps = [], t }) {
                 <div className="min-w-0">
                   <p className="text-caption font-semibold text-ink">
                     {s.agent}
-                    <span className="ml-2 font-mono text-meta font-normal uppercase text-ink-dim">
+                    <span className="ml-2 font-mono text-meta font-normal text-ink-dim">
                       {done ? t.stepDone : t.stepRunning}
                     </span>
                   </p>

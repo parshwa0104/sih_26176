@@ -26,7 +26,7 @@ export default function AIInsights({
       {!hideHeader && (
         <div className="flex items-center gap-field">
           <Sonar size={16} active={false} />
-          <h2 className="font-display text-label uppercase text-ink">{t.insightsTitle}</h2>
+          <h2 className="font-display text-caption font-semibold text-ink">{t.insightsTitle}</h2>
         </div>
       )}
 
@@ -56,7 +56,7 @@ export default function AIInsights({
                     <button
                       type="button"
                       onClick={() => onAction?.(ins.action)}
-                      className="mt-1.5 inline-flex items-center gap-1 rounded-md border border-hairline px-2 py-1 text-label text-accent transition-colors hover:bg-black/5"
+                      className="mt-1.5 inline-flex items-center gap-1 rounded-xl border border-hairline px-2 py-1 text-label text-accent transition-colors hover:bg-black/5"
                     >
                       {ins.action.type === 'map' ? t.viewOnMap : t.askAboutThis}
                       <ChevronRight size={11} />

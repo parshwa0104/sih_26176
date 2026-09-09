@@ -31,7 +31,7 @@ export default function BottomSheet({ open, title, onClose, closeLabel = 'Close'
         aria-modal="true"
         aria-label={title}
         className={cx(
-          'absolute inset-x-0 bottom-0 max-h-[82dvh] overflow-y-auto rounded-t-2xl border-t border-hairline-strong bg-ocean-850 pb-[max(env(safe-area-inset-bottom),16px)] transition-transform duration-300 ease-instr',
+          'absolute inset-x-0 bottom-0 max-h-[82dvh] overflow-y-auto rounded-t-xl border-t border-hairline-strong bg-ocean-850 pb-[max(env(safe-area-inset-bottom),16px)] transition-transform duration-300 ease-instr',
           open ? 'translate-y-0' : 'translate-y-full',
         )}
       >
@@ -39,12 +39,12 @@ export default function BottomSheet({ open, title, onClose, closeLabel = 'Close'
           <span className="h-1 w-10 rounded-full bg-black/15" />
         </div>
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-hairline bg-ocean-850/95 px-panel py-stack backdrop-blur">
-          <h2 className="font-display text-label uppercase text-ink">{title}</h2>
+          <h2 className="font-display text-caption font-semibold text-ink">{title}</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label={closeLabel}
-            className="-mr-1.5 grid h-10 w-10 place-items-center rounded-lg text-ink-dim hover:bg-black/5"
+            className="-mr-1.5 grid h-10 w-10 place-items-center rounded-xl text-ink-dim hover:bg-black/5"
           >
             <X size={18} />
           </button>

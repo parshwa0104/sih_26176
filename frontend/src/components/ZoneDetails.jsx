@@ -16,9 +16,7 @@ export default function ZoneDetails({ zone, onAsk, onCenter, t }) {
     <div className="space-y-3">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="font-display text-label uppercase text-status-safe">
-            {zone.label || 'PFZ'}
-          </p>
+          <p className="font-display text-label text-status-safe">{zone.label || 'PFZ'}</p>
           <h3 className="mt-1 text-heading font-bold text-ink">
             {zone.description || t.legendPfz}
           </h3>
@@ -26,7 +24,7 @@ export default function ZoneDetails({ zone, onAsk, onCenter, t }) {
         {zone.confidence && (
           <span
             className={cx(
-              'shrink-0 rounded-full border px-2 py-0.5 text-meta font-bold uppercase',
+              'shrink-0 rounded-full border px-2 py-0.5 text-meta font-bold',
               CONF_PILL[zone.confidence] || CONF_PILL.Low,
             )}
           >
@@ -49,23 +47,23 @@ export default function ZoneDetails({ zone, onAsk, onCenter, t }) {
               <span className="font-semibold text-ink">{t.why}: </span>
               {c.sst ? `${t.sst} ${c.sst}` : ''}
               {c.sst_range ? ` (${c.sst_range})` : ''}
-              {c.chlorophyll ? ` · ${t.chla} ${c.chlorophyll}` : ''}
+              {c.chlorophyll ? `, ${t.chla} ${c.chlorophyll}` : ''}
             </p>
           )}
           {(c.wind_speed || c.wave_height) && (
             <p className="mt-1">
               <span className="font-semibold text-ink">{t.conditions}: </span>
               {c.wind_speed ? `${t.wind} ${c.wind_speed}` : ''}
-              {c.wave_height ? ` · ${t.waves} ${c.wave_height}` : ''}
+              {c.wave_height ? `, ${t.waves} ${c.wave_height}` : ''}
               {c.craft_advisory ? (
-                <span className="text-status-safe"> — {c.craft_advisory}</span>
+                <span className="text-status-safe"> ({c.craft_advisory})</span>
               ) : null}
             </p>
           )}
           {(zone.source || zone.updated) && (
-            <p className="mt-1.5 font-mono text-meta uppercase text-ink-dim/80">
+            <p className="mt-1.5 font-mono text-meta text-ink-dim/80">
               {zone.source}
-              {zone.updated ? ` · ${t.asOf} ${zone.updated}` : ''}
+              {zone.updated ? `, ${t.asOf} ${zone.updated}` : ''}
             </p>
           )}
         </div>
@@ -75,7 +73,7 @@ export default function ZoneDetails({ zone, onAsk, onCenter, t }) {
         <button
           type="button"
           onClick={() => onAsk?.(`Tell me about fishing near ${zone.description || zone.label}`)}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1.5 text-label text-accent transition-colors hover:bg-black/5"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-hairline px-2.5 py-1.5 text-label text-accent transition-colors hover:bg-black/5"
         >
           <Compass size={13} />
           {t.askAboutThis}
@@ -84,7 +82,7 @@ export default function ZoneDetails({ zone, onAsk, onCenter, t }) {
           <button
             type="button"
             onClick={() => onCenter?.([zone.lat, zone.lng], 10)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1.5 text-label text-ink-dim transition-colors hover:text-ink"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-hairline px-2.5 py-1.5 text-label text-ink-dim transition-colors hover:text-ink"
           >
             <MapPin size={13} />
             {t.viewOnMap}

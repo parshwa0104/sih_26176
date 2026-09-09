@@ -2,14 +2,12 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 
+// firebase.js
 const firebaseConfig = {
-  apiKey: "AIzaSyB8m24jwZ2orlpp0U_e4Shuehu1h6U6HY8",
-  authDomain: "orca-b5511.firebaseapp.com",
-  projectId: "orca-b5511",
-  storageBucket: "orca-b5511.firebasestorage.app",
-  messagingSenderId: "420868870235",
-  appId: "1:420868870235:web:00037fb928caf77f3a2f7e",
-  measurementId: "G-N2JQ7PVLMF"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  // etc
 };
 
 const app = initializeApp(firebaseConfig);

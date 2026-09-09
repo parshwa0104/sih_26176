@@ -20,15 +20,15 @@ export default function Modal({ title, onClose, closeLabel = 'Close', children }
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="relative w-full max-w-md animate-fade-up overflow-hidden rounded-2xl border border-hairline-strong bg-ocean-850 shadow-inst"
+        className="relative w-full max-w-md animate-fade-up overflow-hidden rounded-xl border border-hairline-strong bg-ocean-850 shadow-inst"
       >
         <div className="flex items-center justify-between border-b border-hairline px-panel py-stack">
-          <h2 className="font-display text-label uppercase text-ink">{title}</h2>
+          <h2 className="font-display text-caption font-semibold text-ink">{title}</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label={closeLabel}
-            className="-mr-1.5 grid h-10 w-10 place-items-center rounded-lg text-ink-dim hover:bg-black/5"
+            className="-mr-1.5 grid h-10 w-10 place-items-center rounded-xl text-ink-dim hover:bg-black/5"
           >
             <X size={18} />
           </button>
