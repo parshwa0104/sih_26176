@@ -90,7 +90,8 @@
   position: absolute;
   top: 100%;
   margin-top: 10px;
-  width: 190px;
+  width: max-content;
+  max-width: 260px;
   padding: 9px 11px;
   font-size: 11px;
   line-height: 1.45;
