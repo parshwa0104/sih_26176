@@ -13,8 +13,8 @@ def get_llm(temperature: float = 0.0):
     # 1. Primary: Groq (Qwen 3.6 27B — replaces decommissioned llama-3.3-70b-versatile)
     groq_llm = ChatGroq(model="qwen/qwen3.6-27b", temperature=temperature)
     
-    # 2. Secondary: Google Gemini (Gemini 2.5 Flash)
-    gemini_llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=temperature)
+    # 2. Secondary: Google Gemini (Gemini 1.5 Flash)
+    gemini_llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=temperature)
     
     # Build fallback chain
     fallbacks = [gemini_llm]
