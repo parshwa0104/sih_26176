@@ -31,9 +31,6 @@ export default function AgentNode({ agent, position, status, showFinding, side =
         </span>
       </div>
 
-      {showFinding && status === 'complete' && (
-        <div className={`agent-node-finding glass-panel side-${side}`}>{agent.finding}</div>
-      )}
     </div>
   )
 }
