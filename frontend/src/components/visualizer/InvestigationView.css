@@ -1,10 +1,11 @@
 .investigation-view {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
+  position: relative;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   animation: viewFadeIn 0.5s ease both;
+  padding: 12px;
 }
 
 @keyframes viewFadeIn {

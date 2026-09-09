@@ -57,8 +57,15 @@ def get_map_data(pfz_data, safety_data, geofence_data, route_data, weather_data=
 def generate_response_stream(query: str, language: str, pfz_data: dict, weather_data: dict,
                               safety_data: dict, geofence_data: dict = None,
                               historical_data: dict = None, route_data: dict = None):
-    """Stream the final natural-language response token by token."""
+    """Stream the final natural-language response token by token.
+    Strips <think>...</think> reasoning blocks from thinking models (e.g. Qwen).
+    """
     chain = response_prompt | llm
+
+    # State for stripping <think> blocks:
+    # None = haven't decided yet, True = inside think block, False = no think block
+    in_think = None
+    buffer = ""
 
     for chunk in chain.stream({
         "query": query,
@@ -70,5 +77,45 @@ def generate_response_stream(query: str, language: str, pfz_data: dict, weather_
         "historical_data": historical_data or "None",
         "route_data": route_data or "None",
     }):
-        if chunk.content:
-            yield chunk.content
+        if not chunk.content:
+            continue
+
+        token = chunk.content
+
+        # Phase 1: Still deciding if there's a think block
+        if in_think is None:
+            buffer += token
+            if "<think>" in buffer:
+                in_think = True
+                buffer = buffer.split("<think>", 1)[1]
+                # Check if </think> is also in this chunk
+                if "</think>" in buffer:
+                    rest = buffer.split("</think>", 1)[1].lstrip("\n ")
+                    buffer = ""
+                    in_think = False
+                    if rest:
+                        yield rest
+            elif len(buffer) > 12 or ("<" not in buffer and buffer.strip()):
+                # No think block — flush the buffer and switch to passthrough
+                in_think = False
+                yield buffer
+                buffer = ""
+            continue
+
+        # Phase 2: Inside think block — buffer and wait for </think>
+        if in_think:
+            buffer += token
+            if "</think>" in buffer:
+                rest = buffer.split("</think>", 1)[1].lstrip("\n ")
+                buffer = ""
+                in_think = False
+                if rest:
+                    yield rest
+            continue
+
+        # Phase 3: Normal streaming (think block already handled or absent)
+        yield token
+
+    # Flush anything left in the buffer
+    if buffer and not in_think:
+        yield buffer
