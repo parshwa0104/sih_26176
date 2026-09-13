@@ -11,8 +11,9 @@ from data.geofence import check_geofence
 from data.historical import get_historical_data
 from data.route import compute_safe_route, get_port_coords
 from data.sos import get_sos_contacts
+from langchain_core.runnables import RunnableConfig
 
-def recall_memory_node(state: OrcaState, config: dict):
+def recall_memory_node(state: OrcaState, config: RunnableConfig):
     query = state.get("query", "")
     thread_id = config.get("configurable", {}).get("thread_id", "default_user")
     
