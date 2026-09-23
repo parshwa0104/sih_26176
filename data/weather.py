@@ -2,7 +2,7 @@ def get_weather_data(location: str, date: str) -> dict:
     """Fetch weather and ocean conditions (SST, Chlorophyll, Wind)."""
     if not location:
         return {"error": "Location not specified"}
-        
+
     loc = location.lower()
     base_data = {
         "type": "weather",
@@ -11,7 +11,7 @@ def get_weather_data(location: str, date: str) -> dict:
         "wind_speed": "12.8 m/s",
         "wave_height": "1.6 m"
     }
-    
+
     if "chennai" in loc:
         base_data.update({
             "sst": "30.1°C",
@@ -39,8 +39,8 @@ def get_weather_data(location: str, date: str) -> dict:
     elif "mangalore" in loc or "karnataka" in loc:
         base_data.update({
             "sst": "28.0°C",
-            "wind_speed": "14.2 m/s",
-            "wave_height": "1.8 m",
+            "wind_speed": "24.0 m/s",
+            "wave_height": "2.4 m",
             "lat": 12.9141,
             "lng": 74.8560,
             "color": "blue"
@@ -60,18 +60,18 @@ def get_weather_data(location: str, date: str) -> dict:
             "lng": 73.8278,
             "color": "blue"
         })
-        
+
     # Date-based nudging for realistic multi-day query results
     if date and date.lower() != "today":
         import hashlib
         # deterministic hash of the date + location
         hash_val = int(hashlib.md5(f"{location}{date}".encode()).hexdigest(), 16)
-        
+
         # nudge SST by +/- 0.5 degrees
         sst_val = float(base_data["sst"].replace("°C", ""))
         sst_val += (hash_val % 10 - 5) / 10.0
         base_data["sst"] = f"{round(sst_val, 1)}°C"
-        
+
         # nudge wind by up to 20%
         wind_val = float(base_data["wind_speed"].replace(" m/s", ""))
         wind_val *= 1.0 + ((hash_val % 20 - 10) / 100.0)

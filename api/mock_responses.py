@@ -2,6 +2,9 @@
 NOTE: This data is hardcoded for now for the internal hack prototype.
 Once official API access is secured, these mocks will be replaced with real
 calls to INCOIS and MOSDAC endpoints.
+
+IMPORTANT: Every "source" field below is labelled as simulated prototype data.
+Nothing in this file is live or official INCOIS/MOSDAC output.
 """
 
 MOCK_CONDITIONS = {
@@ -13,7 +16,7 @@ MOCK_CONDITIONS = {
     "chlorophyll": "0.32 mg/m³",
     "safety": "safe",
     "craft_advisory": "Safe for mechanized & country craft",
-    "source": "INCOIS satellite advisory",
+    "source": "Simulated prototype data (not INCOIS)",
     "updated": "6h ago",
     "user_location": {"lat": 9.9312, "lng": 76.2673, "label": "Kochi Port"},
     "alerts": [
@@ -36,7 +39,7 @@ MOCK_PFZ_ZONES = {
                 "wind_speed": "12.8 m/s", "wave_height": "1.6 m",
                 "safety": "safe", "craft_advisory": "Safe for mechanized & country craft"
             },
-            "source": "INCOIS advisory", "updated": "6h ago"
+            "source": "Simulated prototype data (not INCOIS)", "updated": "6h ago"
         },
         {
             "lat": 18.85, "lng": 72.70, "radius": 15000,
@@ -48,7 +51,7 @@ MOCK_PFZ_ZONES = {
                 "wind_speed": "10.5 m/s", "wave_height": "1.2 m",
                 "safety": "safe", "craft_advisory": "Safe for all craft types"
             },
-            "source": "INCOIS advisory", "updated": "2h ago"
+            "source": "Simulated prototype data (not INCOIS)", "updated": "2h ago"
         },
         {
             "lat": 13.08, "lng": 80.45, "radius": 11000,
@@ -60,7 +63,7 @@ MOCK_PFZ_ZONES = {
                 "wind_speed": "45.0 m/s", "wave_height": "4.5 m",
                 "safety": "danger", "craft_advisory": "DO NOT VENTURE — Cyclone Warning"
             },
-            "source": "INCOIS advisory", "updated": "1h ago"
+            "source": "Simulated prototype data (not INCOIS)", "updated": "1h ago"
         },
         {
             "lat": 12.80, "lng": 74.60, "radius": 9000,
@@ -69,10 +72,10 @@ MOCK_PFZ_ZONES = {
             "conditions": {
                 "sst": "28.0°C", "sst_range": "27–29°C (optimal)",
                 "chlorophyll": "0.48 mg/m³ (high)",
-                "wind_speed": "14.2 m/s", "wave_height": "1.8 m",
+                "wind_speed": "24.0 m/s", "wave_height": "2.4 m",
                 "safety": "caution", "craft_advisory": "Caution for country craft"
             },
-            "source": "INCOIS advisory", "updated": "4h ago"
+            "source": "Simulated prototype data (not INCOIS)", "updated": "4h ago"
         },
         {
             "lat": 17.65, "lng": 83.45, "radius": 14000,
@@ -84,7 +87,7 @@ MOCK_PFZ_ZONES = {
                 "wind_speed": "11.0 m/s", "wave_height": "1.4 m",
                 "safety": "safe", "craft_advisory": "Safe for mechanized craft"
             },
-            "source": "INCOIS advisory", "updated": "3h ago"
+            "source": "Simulated prototype data (not INCOIS)", "updated": "3h ago"
         }
     ]
 }
@@ -113,7 +116,7 @@ MOCK_SEA_STATE = {
         {"bounds": [[8.5,  78.0], [11.5, 80.0]], "sst": 29.8, "wave": 3.2, "safety": "caution","label": "South TN Coast"},
 
         # ── Andhra Pradesh / Visakhapatnam coast ──
-        {"bounds": [[15.5, 80.5], [18.5, 83.0]], "sst": 29.5, "wave": 1.4, "safety": "safe",   "label": "Vizag Coast"},
-        {"bounds": [[15.5, 83.0], [18.5, 85.0]], "sst": 29.0, "wave": 1.2, "safety": "safe",   "label": "Vizag Offshore"},
+        {"bounds": [[15.5, 80.5], [18.5, 83.0]], "sst": 29.5, "wave": 1.4, "safety": "safe",   "label": "Visakhapatnam Coast"},
+        {"bounds": [[15.5, 83.0], [18.5, 85.0]], "sst": 29.0, "wave": 1.2, "safety": "safe",   "label": "Visakhapatnam Offshore"},
     ]
 }
