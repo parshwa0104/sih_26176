@@ -6,8 +6,5 @@ python-dotenv
 langchain
 langchain-core
 langgraph
-langchain-groq
-streamlit
-langchain-google-genai
-langchain-community
 langchain-ollama
+streamlit
