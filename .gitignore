@@ -26,3 +26,12 @@ frontend/.env.*.local
 # IDE
 .vscode/
 .idea/
+
+# MOSDAC
+/config.json
+/mdapi.zip
+/mosdac/config.json
+/mosdac/error_logs/
+/mosdac/*.zip
+/mosdac/*.h5
+/mosdac/*.nc
