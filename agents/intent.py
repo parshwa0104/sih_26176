@@ -1,13 +1,19 @@
 import json
+
 from langchain_core.prompts import PromptTemplate
+
 from agents.llm_config import llm_deterministic
 
-llm = llm_deterministic
-# based on user intent, language we are going to decide which script to use from our data directory
+
 intent_prompt = PromptTemplate.from_template(
     """You are an intent classification agent for a marine intelligence system called ORCA.
 
+<<<<<<< HEAD
+Given the user's query, extract the following information and return ONLY a valid JSON object:
+
+=======
 Given the user's query, their recent chat history, and their long-term memory profile, extract the following information and return ONLY a valid JSON object:
+>>>>>>> origin/main
 - 'intent': One of ["pfz", "weather", "safety", "route", "geofence", "analysis", "sos", "general"]
   - "pfz" = user asks about fishing zones, fish locations, where to catch fish
   - "weather" = user asks about SST, chlorophyll, wind, waves, ocean conditions
@@ -15,23 +21,35 @@ Given the user's query, their recent chat history, and their long-term memory pr
   - "route" = user asks for a safe route, path, navigation to a fishing zone
   - "geofence" = user asks about restricted areas, marine protected areas, maritime boundaries, borders
   - "analysis" = user asks WHY something happened, trends, decline, historical data, productivity changes
-  - "sos" = user is in danger, needs emergency help, stuck in cyclone, sinking, etc.
+  - "sos" = user asks for emergency contacts, distress help, MAYDAY, coast guard, rescue
   - "general" = anything else
+<<<<<<< HEAD
+
+- 'location': The geographical location mentioned (or null if none)
+=======
 - 'location': The geographical location mentioned (or null if none). USE CHAT HISTORY AND MEMORY to resolve pronouns (e.g. "there" -> the location discussed previously) or default locations.
+>>>>>>> origin/main
 - 'date': Any time reference (or "today" if none)
 - 'language': The language of the query (e.g., "english", "hindi", "tamil", "bengali", "marathi", "telugu", "malayalam"). Use memory to detect preferred language if not obvious.
 
 Long-Term Memory Context:
 {memory_context}
 
-Chat History:
-{chat_history}
-
-Current Query: {query}
+Query: {query}
 
 Output ONLY the JSON object, no other text:"""
 )
 
+<<<<<<< HEAD
+
+def extract_intent(query: str) -> dict:
+    """Extract intent, location, date, and language from a user query."""
+
+    chain = intent_prompt | llm_deterministic
+
+    response = chain.invoke({"query": query})
+
+=======
 def extract_intent(query: str, history: list = None, memory_context: str = "") -> dict:
     """Extract intent, location, date, and language from a user query."""
     
@@ -52,13 +70,23 @@ def extract_intent(query: str, history: list = None, memory_context: str = "") -
         "chat_history": chat_history,
         "memory_context": memory_context or "No long-term memories."
     })
+>>>>>>> origin/main
     try:
         text = response.content
+
         if "```json" in text:
             text = text.split("```json")[1].split("```")[0].strip()
         elif "```" in text:
             text = text.split("```")[1].split("```")[0].strip()
+
         return json.loads(text)
+
     except Exception as e:
         print("Intent parsing failed:", e, response.content)
-        return {"intent": "general", "location": None, "date": "today", "language": "english"}
+
+        return {
+            "intent": "general",
+            "location": None,
+            "date": "today",
+            "language": "english"
+        }
