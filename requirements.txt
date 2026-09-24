@@ -7,4 +7,5 @@ langchain
 langchain-core
 langgraph
 langchain-ollama
-streamlit
+streamlitchromadb
+langchain-chroma

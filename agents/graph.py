@@ -7,7 +7,8 @@ from agents.tools import (
     route_tool, historical_tool, sos_tool, resolve_location,
 )
 from agents.response import get_map_data
-
+from agents.memory import recall_memories
+from langchain_core.runnables import RunnableConfig
 
 # ─────────────────────────── helpers ───────────────────────────
 
@@ -73,9 +74,11 @@ def prepare_context_node(state: ORCAState) -> dict:
 
 # ────────────────────────── supervisor ─────────────────────────
 
-def supervisor_node(state: ORCAState) -> dict:
+def supervisor_node(state: ORCAState, config: RunnableConfig) -> dict:
     """Understand the query: intent, location, date, language. Decides nothing else."""
-    intent_data = extract_intent(state["query"])
+    thread_id = config.get("configurable", {}).get("thread_id", "default_user")
+    memories = recall_memories(thread_id, state["query"])
+    intent_data = extract_intent(state["query"], state.get("history", []), memories)
 
     extracted = intent_data.get("location")
     location = extracted or resolve_location(None)
@@ -95,6 +98,7 @@ def supervisor_node(state: ORCAState) -> dict:
         "location": location,
         "date": intent_data.get("date", "today"),
         "language": intent_data.get("language", "english"),
+        "long_term_memory": memories,
         "reasoning_trail": trail,
     }
 

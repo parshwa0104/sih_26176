@@ -13,6 +13,7 @@ class ORCAState(TypedDict, total=False):
     history: List[Dict[str, str]]            # raw turns sent by the client
     messages: Annotated[list, add_messages]  # windowed, LLM-ready turns
     conversation_summary: str                # compressed older context
+    long_term_memory: str                    # user memory retrieved from chromadb
 
     # ── Extracted query information ──────────────────────────────
     location: str

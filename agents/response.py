@@ -92,9 +92,16 @@ def _history_text(history):
     return "\n".join(lines) if lines else "(no previous turns)"
 
 
-def get_map_data(pfz_data, safety_data, geofence_data, route_data, weather_data=None):
+def get_map_data(pfz_data, safety_data, geofence_data, route_data, weather_data=None, sos_data=None):
     """Determine map_data based on what data is available (priority order).
     NOTE: argument order is positional and used by graph.py - do not reorder."""
+    if sos_data and sos_data.get("lat"):
+        return {
+            "type": "sos",
+            "lat": sos_data["lat"],
+            "lng": sos_data["lng"],
+            "nearby_vessels": sos_data.get("nearby_vessels", [])
+        }
     if route_data and route_data.get("waypoints"):
         return route_data
     if pfz_data and pfz_data.get("lat"):
