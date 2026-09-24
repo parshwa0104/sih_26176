@@ -32,8 +32,15 @@ Answer:"""
 )
 
 
-def get_map_data(pfz_data, safety_data, geofence_data, route_data, weather_data=None):
+def get_map_data(pfz_data, safety_data, geofence_data, route_data, weather_data=None, sos_data=None):
     """Determine map_data based on what data is available (priority order)."""
+    if sos_data and sos_data.get("lat"):
+        return {
+            "type": "sos",
+            "lat": sos_data["lat"],
+            "lng": sos_data["lng"],
+            "nearby_vessels": sos_data.get("nearby_vessels", [])
+        }
     if route_data and route_data.get("waypoints"):
         return route_data
     if pfz_data and pfz_data.get("lat"):
