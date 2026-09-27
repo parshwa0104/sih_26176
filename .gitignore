@@ -26,3 +26,7 @@ frontend/.env.*.local
 # IDE
 .vscode/
 .idea/
+
+mosdac/config.json
+mosdac/logs/
+mosdac/config_chlorophyll.json
