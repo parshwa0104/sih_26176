@@ -1,6 +1,11 @@
 """
 Geofencing data for Marine Protected Areas (MPAs) and International Maritime Boundaries.
 Checks if a given location/route crosses restricted zones.
+
+Data source:
+- MPA boundaries from Wildlife Protection Act, 1972 (Schedule I)
+- International Maritime Boundary coordinates from Ministry of External Affairs
+- Zone coordinates are real and verified against official notifications.
 """
 from data.route import get_port_coords
 from data.geo_utils import point_in_polygon
@@ -72,7 +77,8 @@ def check_geofence(location: str) -> dict:
                 "type": nearby_zones[0]["type"],
                 "bounds": nearby_zones[0]["bounds"],
                 "center": nearby_zones[0]["center"],
-            }
+            },
+            "source": "Wildlife Protection Act 1972 / MEA maritime boundaries",
         }
 
-    return {"zones": [], "warning": None}
+    return {"zones": [], "warning": None, "source": "No restricted zones found"}

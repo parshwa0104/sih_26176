@@ -7,5 +7,7 @@ langchain
 langchain-core
 langgraph
 langchain-ollama
-streamlitchromadb
+langchain-groq
+langchain-google-genai
 langchain-chroma
+chromadb
