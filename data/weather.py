@@ -104,10 +104,79 @@ def _fetch_open_meteo(lat: float, lng: float, forecast_days: int = 7) -> dict | 
         return None
 
 
-# ─────────────────────── MOSDAC satellite ─────────────────────────
+# ──────────── NOAA ERDDAP (real-time SST + chlorophyll) ────────────
+# JPL MUR SST v4.1 — 1 km resolution, daily, near-real-time
+# MODIS Aqua chlorophyll-a — 4 km resolution, 8-day composite
+# Both are free, no API key required.
+
+ERDDAP_BASE = "https://coastwatch.pfeg.noaa.gov/erddap/griddap"
+MUR_SST_DATASET = "jplMURSST41"           # analysed_sst in °C
+MODIS_CHLA_DATASET = "erdMH1chla8day"      # chlorophyll in mg/m³ (8-day)
+MODIS_CHLA_MONTHLY = "erdMH1chlamday"       # chlorophyll in mg/m³ (monthly, better coverage)
+
+
+def _fetch_erddap_sst(lat: float, lng: float) -> dict | None:
+    """Fetch latest SST from NOAA ERDDAP (JPL MUR SST, 1 km resolution)."""
+    try:
+        url = (
+            f"{ERDDAP_BASE}/{MUR_SST_DATASET}.json"
+            f"?analysed_sst[(last)][({lat}):({lat})][({lng}):({lng})]"
+        )
+        resp = httpx.get(url, timeout=10.0)
+        if resp.status_code != 200:
+            return None
+
+        data = resp.json()
+        rows = data.get("table", {}).get("rows", [])
+        if rows and len(rows[0]) >= 4:
+            sst_val = rows[0][3]
+            if sst_val is not None:
+                return {
+                    "sst_celsius": round(float(sst_val), 1),
+                    "timestamp": rows[0][0],
+                    "source": "NOAA JPL MUR SST v4.1 (1 km, daily)",
+                }
+    except Exception as e:
+        print(f"[weather] ERDDAP SST fetch failed: {e}")
+    return None
+
+
+def _fetch_erddap_chlorophyll(lat: float, lng: float) -> dict | None:
+    """Fetch latest chlorophyll-a from NOAA ERDDAP.
+    Tries 8-day composite first (most recent), then monthly (better coverage)."""
+    for dataset, label in [
+        (MODIS_CHLA_DATASET, "NOAA MODIS Aqua chlorophyll-a (4 km, 8-day)"),
+        (MODIS_CHLA_MONTHLY, "NOAA MODIS Aqua chlorophyll-a (4 km, monthly)"),
+    ]:
+        try:
+            url = (
+                f"{ERDDAP_BASE}/{dataset}.json"
+                f"?chlorophyll[(last)][({lat}):({lat})][({lng}):({lng})]"
+            )
+            resp = httpx.get(url, timeout=10.0)
+            if resp.status_code != 200:
+                continue
+
+            data = resp.json()
+            rows = data.get("table", {}).get("rows", [])
+            if rows and len(rows[0]) >= 4:
+                chla_val = rows[0][3]
+                if chla_val is not None and float(chla_val) > 0:
+                    return {
+                        "chlorophyll_mgm3": round(float(chla_val), 4),
+                        "timestamp": rows[0][0],
+                        "source": label,
+                    }
+        except Exception as e:
+            print(f"[weather] ERDDAP chlorophyll ({dataset}) failed: {e}")
+    return None
+
+
+# ──────────── MOSDAC satellite (secondary for SST/Chl) ────────────
 
 def _fetch_mosdac_sst_chlorophyll(lat: float, lng: float) -> dict | None:
-    """Read SST and chlorophyll from locally downloaded MOSDAC satellite files."""
+    """Read SST and chlorophyll from locally downloaded MOSDAC satellite files.
+    Falls back to this when ERDDAP is unavailable and local files exist."""
     try:
         from data.mosdac_reader import get_sst_chlorophyll_at_location
         from datetime import datetime
@@ -221,21 +290,41 @@ def get_weather_data(location: str, date: str) -> dict:
         result["wave_height"] = f"{repr_data['wave']} m"
         sources.append("representative-data (Open-Meteo unavailable)")
 
-    # ── 2. SST + Chlorophyll from MOSDAC ──
-    mosdac = _fetch_mosdac_sst_chlorophyll(ocean_lat, ocean_lng)
-    if mosdac:
-        result["sst"] = f"{round(mosdac['sst_celsius'], 1)}°C"
-        if mosdac.get("chlorophyll") is not None:
-            result["chlorophyll"] = f"{round(mosdac['chlorophyll'], 2)} mg/m³"
-        sources.append(f"MOSDAC INSAT-3D ({mosdac.get('date', 'cached')})")
+    # ── 2. SST from NOAA ERDDAP → MOSDAC → representative ──
+    erddap_sst = _fetch_erddap_sst(ocean_lat, ocean_lng)
+    if erddap_sst:
+        result["sst"] = f"{erddap_sst['sst_celsius']}°C"
+        sources.append(erddap_sst["source"])
     else:
-        # Fallback: representative SST/chlorophyll
-        repr_data = _REPRESENTATIVE.get(loc, _DEFAULT_REPR)
-        repr_data = _nudge_for_date(repr_data, location, date)
-        result.setdefault("sst", f"{repr_data['sst']}°C")
-        result.setdefault("chlorophyll", f"{repr_data['chlorophyll']} mg/m³")
-        if "representative-data" not in " ".join(sources):
-            sources.append("representative-data (MOSDAC files unavailable)")
+        mosdac = _fetch_mosdac_sst_chlorophyll(ocean_lat, ocean_lng)
+        if mosdac:
+            result["sst"] = f"{round(mosdac['sst_celsius'], 1)}°C"
+            sources.append(f"MOSDAC INSAT-3D ({mosdac.get('date', 'cached')})")
+        else:
+            repr_data = _nudge_for_date(
+                _REPRESENTATIVE.get(loc, _DEFAULT_REPR), location, date
+            )
+            result["sst"] = f"{repr_data['sst']}°C"
+            sources.append("representative-data (SST)")
+
+    # ── 3. Chlorophyll from NOAA ERDDAP → MOSDAC → representative ──
+    erddap_chl = _fetch_erddap_chlorophyll(ocean_lat, ocean_lng)
+    if erddap_chl:
+        result["chlorophyll"] = f"{erddap_chl['chlorophyll_mgm3']} mg/m³"
+        sources.append(erddap_chl["source"])
+    else:
+        mosdac = _fetch_mosdac_sst_chlorophyll(ocean_lat, ocean_lng)
+        if mosdac and mosdac.get("chlorophyll") is not None:
+            result["chlorophyll"] = f"{round(mosdac['chlorophyll'], 2)} mg/m³"
+            if "MOSDAC" not in " ".join(sources):
+                sources.append(f"MOSDAC OCM-3 ({mosdac.get('date', 'cached')})")
+        else:
+            repr_data = _nudge_for_date(
+                _REPRESENTATIVE.get(loc, _DEFAULT_REPR), location, date
+            )
+            result["chlorophyll"] = f"{repr_data['chlorophyll']} mg/m³"
+            if "representative-data" not in " ".join(sources):
+                sources.append("representative-data (chlorophyll)")
 
     result["source"] = " + ".join(sources)
     return result

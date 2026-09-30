@@ -11,7 +11,7 @@ def get_llm(temperature: float = 0.2):
 
     if os.getenv("GROQ_API_KEY"):
         from langchain_groq import ChatGroq
-        models.append(ChatGroq(model="qwen/qwen3.6-27b", temperature=temperature))
+        models.append(ChatGroq(model="llama-3.1-8b-instant", temperature=temperature))
 
     if os.getenv("GOOGLE_API_KEY"):
         from langchain_google_genai import ChatGoogleGenerativeAI

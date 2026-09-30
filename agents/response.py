@@ -130,8 +130,8 @@ def get_map_data(pfz_data, safety_data, geofence_data, route_data, weather_data=
 def generate_response_stream(query: str, language: str, pfz_data: dict, weather_data: dict,
                              safety_data: dict, geofence_data: dict = None,
                              historical_data: dict = None, route_data: dict = None,
-                             verdict: str = None, correlation_note: str = None,
-                             history: list = None):
+                             sos_data: dict = None, verdict: str = None, 
+                             correlation_note: str = None, history: list = None):
     """Stream the final explanation token by token.
 
     The extra arguments are optional, so the legacy agents/orca.py caller keeps working.
