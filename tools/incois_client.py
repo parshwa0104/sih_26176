@@ -1,5 +1,5 @@
 from langchain_core.tools import tool
-
+from data.mosdac_reader import get_sst_chlorophyll_at_location
 @tool
 def get_pfz_data(location: str) -> str:
     """Fetch Potential Fishing Zone (PFZ) data from INCOIS for a specific location. Use this to find the nearest PFZ."""
@@ -49,8 +49,66 @@ def get_weather_safety(location: str) -> str:
 
 @tool
 def get_sst_chlorophyll(location: str) -> str:
-    """Fetch Sea Surface Temperature (SST) and Chlorophyll data for a location."""
-    return (
-        f"Data for {location}: SST is 28.5°C, Chlorophyll-a is 1.2 mg/m^3 indicating good conditions for pelagic fish."
-        f"MAP_DATA: {{\"type\": \"sst\", \"lat\": 15.0, \"lng\": 75.0, \"value\": 28.5, \"color\": \"blue\"}}"
+    """Fetch real MOSDAC SST and chlorophyll data for a location."""
+
+    location_lower = location.lower()
+
+    # Coordinates for known locations
+    if "mumbai" in location_lower:
+        latitude = 19.0760
+        longitude = 72.8777
+    elif "goa" in location_lower or "panaji" in location_lower:
+        latitude = 15.4909
+        longitude = 73.8278
+    elif "kochi" in location_lower or "kerala" in location_lower:
+        latitude = 9.9312
+        longitude = 76.2673
+    elif "chennai" in location_lower or "tamil" in location_lower:
+        latitude = 13.0827
+        longitude = 80.2707
+    else:
+        return f"Unable to find coordinates for {location}."
+
+    from datetime import datetime
+
+    # Currently using the downloaded MOSDAC data
+    observation_date = datetime(2014, 1, 24)
+
+    # Our downloaded SST file is the 09:00 observation
+    observation_time = datetime(2014, 1, 24, 9, 0)
+
+    data = get_sst_chlorophyll_at_location(
+        latitude,
+        longitude,
+        observation_date,
+        observation_time
     )
+
+    if data["sst_celsius"] is None:
+        return f"MOSDAC SST data is unavailable for {location}."
+
+    result = (
+        f"MOSDAC data for {location}: "
+        f"SST is {data['sst_celsius']}°C."
+    )
+
+    if data["chlorophyll"] is not None:
+        result += (
+            f" Chlorophyll-a is {data['chlorophyll']} mg/m³."
+        )
+    else:
+        result += (
+            " Chlorophyll-a data is unavailable for this date."
+        )
+
+    result += (
+        f" MAP_DATA: {{"
+        f"\"type\": \"sst\", "
+        f"\"lat\": {data['sst_location']['latitude']}, "
+        f"\"lng\": {data['sst_location']['longitude']}, "
+        f"\"value\": {data['sst_celsius']}, "
+        f"\"color\": \"blue\""
+        f"}}"
+    )
+
+    return result
