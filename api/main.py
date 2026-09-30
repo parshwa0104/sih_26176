@@ -15,7 +15,12 @@ app = FastAPI(title="ORCA — Ocean Risk & Catch Advisor")
 # CORS — comma-separated list of allowed origins via env var.
 # Dev default: Vite local dev server. In production set ALLOWED_ORIGINS in your
 # deployment environment (e.g. "https://orca-frontend.vercel.app")
-_raw_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:4173")
+_raw_origins = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:5173,http://localhost:4173,"
+    "https://sih-26176.vercel.app,"
+    "https://sih-26176.onrender.com"
+)
 ALLOWED_ORIGINS = [o.strip() for o in _raw_origins.split(",") if o.strip()]
 
 app.add_middleware(
