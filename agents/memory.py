@@ -3,7 +3,7 @@ from langchain_chroma import Chroma
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 def get_vector_store():
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+    embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
     # Use persistent client so data survives restarts
     persist_directory = os.path.join(os.path.dirname(__file__), "..", "data", "chroma_db")
     

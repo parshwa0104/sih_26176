@@ -2,7 +2,7 @@
 ORCA Orchestrator — the central pipeline that coordinates all agents and data sources.
 Builds a reasoning trail for explainable AI.
 """
-from agents.graph import app
+from agents.graph import orca_graph as app
 from agents.response import generate_response_stream
 
 def process_query_stream(query: str, history: list = None, thread_id: str = "default_user"):
