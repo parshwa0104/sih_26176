@@ -1,6 +1,8 @@
 import json
 import os
-from typing import Dict, List
+import logging
+from datetime import datetime, timezone
+from typing import Dict, List, Optional
 
 from dotenv import load_dotenv
 
@@ -21,8 +23,9 @@ USE_LEGACY = os.getenv("ORCA_USE_LEGACY", "0") == "1"
 if USE_LEGACY:
     from agents.orca import process_query_stream
 
-# Honest provenance: the prototype never claims to be live INCOIS data.
-DATA_SOURCE = "simulated-prototype"
+# Provenance is now per-response: each data module includes its own
+# 'source' field (e.g. "Open-Meteo Marine API (live)", "representative-data").
+# The /query endpoint collects these into a 'data_sources' dict.
 
 app = FastAPI(title="ORCA SIH Proto")
 
@@ -48,7 +51,7 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"message": "ORCA V2 Backend Running", "data_source": DATA_SOURCE}
+    return {"message": "ORCA V2 Backend Running"}
 
 
 class QueryRequest(BaseModel):
@@ -65,6 +68,14 @@ def _final_event(state: dict, text: str) -> dict:
     safety = state.get("safety_data") or {}
     geofence = state.get("geofence_data") or {}
 
+    # Collect provenance from every data module that ran
+    data_sources = {}
+    for key in ("weather_data", "pfz_data", "safety_data",
+                "geofence_data", "route_data", "historical_data", "sos_data"):
+        src = (state.get(key) or {}).get("source")
+        if src:
+            data_sources[key.replace("_data", "")] = src
+
     event = {
         "type": "done",
         "text": text,
@@ -75,7 +86,7 @@ def _final_event(state: dict, text: str) -> dict:
         "language": state.get("language"),
         "verdict": state.get("verdict"),
         "correlation_note": state.get("correlation_note"),
-        "data_source": DATA_SOURCE,
+        "data_sources": data_sources,
     }
 
     if safety.get("status"):
@@ -107,7 +118,7 @@ def _sse_stream(query: str, history: list):
             "text": f"ORCA could not complete this request: {exc}",
             "map_data": None,
             "reasoning_trail": [],
-            "data_source": DATA_SOURCE,
+            "data_sources": {},
         })
         yield "data: [DONE]\n\n"
         return
@@ -152,14 +163,52 @@ def process_query_endpoint(request: QueryRequest):
 
 @app.get("/conditions")
 def get_conditions():
-    return MOCK_CONDITIONS
+    data = dict(MOCK_CONDITIONS)
+    data["data_provenance"] = "dashboard-demo-data (static snapshot for UI demonstration)"
+    return data
 
 
 @app.get("/pfz-zones")
 def get_pfz_zones():
-    return MOCK_PFZ_ZONES
+    data = dict(MOCK_PFZ_ZONES)
+    data["data_provenance"] = "dashboard-demo-data (representative PFZ zones for UI demonstration)"
+    return data
 
 
 @app.get("/sea-state")
 def get_sea_state():
-    return MOCK_SEA_STATE
+    data = dict(MOCK_SEA_STATE)
+    data["data_provenance"] = "dashboard-demo-data (representative sea state for UI demonstration)"
+    return data
+
+
+# ── Feedback endpoint (advisory accuracy tracking) ──────────────────
+
+logger = logging.getLogger("orca.feedback")
+
+
+class FeedbackRequest(BaseModel):
+    query: str
+    verdict: str
+    feedback: str  # "helpful" | "wrong" | "partially_correct"
+    location: Optional[str] = None
+    comment: Optional[str] = None
+
+
+@app.post("/feedback")
+def submit_feedback(req: FeedbackRequest):
+    """Log user feedback on advisory accuracy.
+
+    In production this would write to a database.  For the prototype
+    we log to stdout (visible in Render logs) with a structured format.
+    """
+    entry = {
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "query": req.query,
+        "verdict": req.verdict,
+        "feedback": req.feedback,
+        "location": req.location,
+        "comment": req.comment,
+    }
+    logger.info("FEEDBACK: %s", json.dumps(entry))
+    return {"status": "recorded", "message": "Thank you for your feedback."}

@@ -1,6 +1,10 @@
 """
-Route optimization: compute a mock safe route from a port to a PFZ,
+Route optimization: compute a safe route from a port to a PFZ,
 factoring in weather hazards and geofenced zones to avoid.
+
+Current implementation: Great-circle midpoint interpolation with hazard
+avoidance nudging.  In production, this would use A* or Dijkstra over
+a sea-state grid with real bathymetry data.
 """
 
 
@@ -37,7 +41,8 @@ def compute_safe_route(origin_lat: float, origin_lng: float,
             (((dest_lat - origin_lat) ** 2 + (dest_lng - origin_lng) ** 2) ** 0.5 * 111) / 15, 1
         ),
         "avoidances": [h.get("name", "hazard") for h in hazards] if hazards else [],
-        "color": "blue"
+        "color": "blue",
+        "source": "prototype-routing (midpoint interpolation with hazard avoidance)",
     }
 
     return route
