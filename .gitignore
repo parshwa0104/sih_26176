@@ -27,6 +27,14 @@ frontend/.env.*.local
 .vscode/
 .idea/
 
+# MOSDAC
 mosdac/config.json
 mosdac/logs/
 mosdac/config_chlorophyll.json
+/config.json
+/mdapi.zip
+/mosdac/error_logs/
+/mosdac/*.zip
+/mosdac/*.h5
+/mosdac/*.nc
+

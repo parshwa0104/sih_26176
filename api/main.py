@@ -26,9 +26,16 @@ DATA_SOURCE = "simulated-prototype"
 
 app = FastAPI(title="ORCA SIH Proto")
 
+# CORS — comma-separated list of allowed origins via env var.
+# Dev default includes Vite local dev server + deployed frontend/backend.
 _origins_env = os.getenv("ALLOWED_ORIGINS")
 _origins = ([o.strip() for o in _origins_env.split(",") if o.strip()]
-            if _origins_env else ["http://localhost:5173", "http://localhost:4173"])
+            if _origins_env else [
+                "http://localhost:5173",
+                "http://localhost:4173",
+                "https://sih-26176.vercel.app",
+                "https://sih-26176.onrender.com",
+            ])
 
 app.add_middleware(
     CORSMiddleware,
